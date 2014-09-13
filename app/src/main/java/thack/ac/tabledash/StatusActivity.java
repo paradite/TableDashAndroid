@@ -14,12 +14,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class StatusActivity extends BaseActivity {
+
+    public static ArrayList<Table> tables = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Create tables
+        tables = new ArrayList<Table>();
 
         // Setup action bar for tabs
         ActionBar actionBar = getActionBar();
@@ -38,13 +45,19 @@ public class StatusActivity extends BaseActivity {
                         this, "graphical", GraphicalFragment.class));
 
         actionBar.addTab(tab);
+
+        // new Table(context, String id, int durationLeft, int locationX, int locationY)
+        tables.add(new Table(this, "Guest 0", 30, 80, 80));
+        tables.add(new Table(this, "Guest 1", 30, 600, 80));
+        tables.add(new Table(this, "Guest 2", 30, 80, 600));
+        tables.add(new Table(this, "Guest 3", 30, 600, 600));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.status_action_bar, menu);
         return true;
     }
 
@@ -53,6 +66,12 @@ public class StatusActivity extends BaseActivity {
         // Handle action bar item clicks here.
         switch(item.getItemId())
         {
+            case R.id.action_update:
+                // Update statistics & graphical layout fragments
+                for(Table table : tables)
+                {
+                }
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -125,6 +144,8 @@ public class StatusActivity extends BaseActivity {
      */
     public static class GraphicalFragment extends Fragment {
 
+        public static GraphicalLayout graphicalLayout;
+
         public GraphicalFragment() {
         }
 
@@ -132,7 +153,8 @@ public class StatusActivity extends BaseActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
-            return new GraphicalLayout(getActivity());
+            graphicalLayout = new GraphicalLayout(getActivity());
+            return graphicalLayout;
         }
     }
 }

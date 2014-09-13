@@ -12,21 +12,27 @@ import android.graphics.Rect;
 public class Table {
 
     public static Bitmap bitmap = null;
-    private int durationLeft;
+
+    private String id;
+    private int durationLeft; // Should be in seconds
     private Paint paint;
     private Rect rect;
 
-    public Table(Context context, int durationLeft, int left, int top) {
+    public Table(Context context, String id, int durationLeft, int locationX, int locationY) {
         if(bitmap == null)
         {
             bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.table);
         }
 
+        this.id = id;
         this.durationLeft = durationLeft;
+
         this.paint = new Paint();
         updatePaint();
 
-        rect = new Rect(left, top, left + bitmap.getWidth(), top + bitmap.getHeight());
+        rect = new Rect(locationX, locationY,
+                locationX + bitmap.getWidth(),
+                locationY + bitmap.getHeight());
     }
 
     public int getDurationLeft() {
@@ -34,25 +40,21 @@ public class Table {
     }
 
     public void setDurationLeft(int durationLeft) {
-        this.durationLeft = durationLeft;
+        this.durationLeft = (durationLeft <= 0) ? 0 : durationLeft;
+        updatePaint();
     }
 
     public void updatePaint()
     {
-        if(durationLeft >= 30) {
+        if(durationLeft > 30) {
             ColorFilter filter = new LightingColorFilter(Color.RED, 1);
             paint.setColorFilter(filter);
         }
-        else if(durationLeft <= 0) {
-            ColorFilter filter = new LightingColorFilter(Color.WHITE, 1);
-            paint.setColorFilter(filter);
-        }
-        else if(durationLeft <= 5) {
-            ColorFilter filter = new LightingColorFilter(Color.GREEN, 1);
-            paint.setColorFilter(filter);
-        }
-        else if(durationLeft <= 15) {
-            ColorFilter filter = new LightingColorFilter(Color.YELLOW, 1);
+        else {
+            int redValue = (int)((durationLeft/30.0) * 255);
+            int greenValue = (int)( ((30 - durationLeft)/30.0) * 255);
+
+            ColorFilter filter = new LightingColorFilter(Color.rgb(redValue, greenValue, 0), 1);
             paint.setColorFilter(filter);
         }
     }

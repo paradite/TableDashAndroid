@@ -13,36 +13,85 @@
     
     tools:context=".StatusActivity$StatisticsFragment" >
 
-    <ProgressBar
-        android:id="@+id/progBar_Statistics_temp"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="240dp"
-        android:layout_height="240dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
-
     <TextView
-        android:id="@+id/tv_Statistics_loadingStats"
+        android:id="@+id/tv_totalTables"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
+
         android:layout_marginTop="40dp"
         
-        android:text="@string/loading_statistics"
+        android:text="@string/total_tables"
         android:textColor="#0000CC"
         android:textSize="28sp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tv_Statistics_stillLoading"
+        android:id="@+id/tv_totalTables_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="40dp"
-        
-        android:text="@string/still_loading"
+
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/tv_totalTables"
+        android:layout_toEndOf="@id/tv_totalTables"
+
+        android:text="@string/temp_value_zero"
+        android:textColor="#0000CC"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_vacantTables"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/tv_totalTables"
+        android:layout_marginTop="20dp"
+
+        android:text="@string/vacant_tables"
+        android:textColor="#0000CC"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_vacantTables_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_alignBottom="@id/tv_vacantTables"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/tv_vacantTables"
+        android:layout_toEndOf="@id/tv_vacantTables"
+
+        android:text="@string/temp_value_zero"
+        android:textColor="#0000CC"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_averageWaitingTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/tv_vacantTables"
+        android:layout_marginTop="20dp"
+
+        android:text="@string/avg_waiting_time"
+        android:textColor="#0000CC"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_averageWaitingTime_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_alignBottom="@id/tv_averageWaitingTime"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/tv_averageWaitingTime"
+        android:layout_toEndOf="@id/tv_averageWaitingTime"
+
+        android:text="@string/temp_value_zero"
         android:textColor="#0000CC"
         android:textSize="28sp"
         android:textStyle="bold" />

@@ -3,37 +3,55 @@ package thack.ac.tabledash;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.Shader;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import java.util.ArrayList;
 
 public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callback {
 
     private GraphicsThread _thread;
 
-    public static ArrayList<Table> tables;
+    private Paint paint;
+    private Rect rect;
+
+    private Paint paintBlack;
 
     public GraphicalLayout(Context context) {
         super(context);
         getHolder().addCallback(this);
 
-        tables = new ArrayList<Table>();
-        tables.add(new Table(context, 30, 0, 0));
-        tables.add(new Table(context, 15, tables.get(0).getRect().width() + 40, 0));
-        tables.add(new Table(context, 5, 0, tables.get(0).getRect().height() + 40));
-        tables.add(new Table(context, 0, tables.get(0).getRect().width() + 40, tables.get(0).getRect().height() + 40));
+        paintBlack = new Paint(Color.BLACK);
+        paintBlack.setTextSize(50);
     }
 
     @Override
     public void onDraw(Canvas canvas) {
         // Clears the canvas
-        canvas.drawColor(Color.BLACK);
+        canvas.drawColor(Color.WHITE);
 
-        for(Table table : tables) {
-            canvas.drawBitmap(Table.bitmap, table.getRect().left, table.getRect().top, table.getPaint());
+        if(StatusActivity.tables != null) {
+            // Redraw the tables every second
+            // Update the duration left for each table
+            for (Table table : StatusActivity.tables) {
+                canvas.drawBitmap(Table.bitmap, table.getRect().left, table.getRect().top, table.getPaint());
+                table.setDurationLeft(table.getDurationLeft() - 1);
+            }
         }
+
+        if(rect == null)
+        {
+            rect = new Rect(60, canvas.getHeight() - 200, canvas.getWidth() - 60, canvas.getHeight() - 60);
+            Shader shader = new LinearGradient(rect.left, 0, rect.right, 0, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
+            paint = new Paint();
+            paint.setShader(shader);
+        }
+        canvas.drawRect(rect, paint);
+
+        canvas.drawText("Occupied", 40, canvas.getHeight() - 240, paintBlack);
+        canvas.drawText("Vacant", canvas.getWidth() - 200, canvas.getHeight() - 240, paintBlack);
     }
 
     @Override
@@ -80,12 +98,18 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
                 c = null;      //set to false and loop ends, stopping thread
 
                 try {
+                    // Limit to one frame per second
+                    Thread.sleep(1000);
+
                     c = _surfaceHolder.lockCanvas(null);
                     synchronized (_surfaceHolder) {
 
                     //Insert methods to modify positions of items in onDraw()
                     postInvalidate();
                     }
+                }
+                catch (InterruptedException e1) {
+                    e1.printStackTrace();
                 }
                 finally {
                     if (c != null) {
