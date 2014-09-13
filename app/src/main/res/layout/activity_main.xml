@@ -18,13 +18,24 @@
 
         android:saveEnabled="true" >
 
+        <ImageView
+            android:id="@+id/iv_main_image"
+
+            android:background="@drawable/animation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp" />
+
         <TextView
             android:id="@+id/tv_main_checkIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
+            android:layout_below="@id/iv_main_image"
+            android:layout_marginTop="40dp"
 
             android:text="@string/tap_card"
             android:textSize="28sp"
@@ -42,7 +53,7 @@
             android:layout_marginBottom="2dp"
 
             android:text="@string/check_status"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="#3300CC"
 

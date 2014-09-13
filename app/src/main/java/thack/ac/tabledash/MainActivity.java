@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.AnimationDrawable;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -12,11 +13,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends BaseActivity implements OnClickListener {
 
+
+    private AnimationDrawable tapAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +29,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
         mStatusView = (TextView) findViewById(R.id.tv_main_checkIn);
         checkOutButton = findViewById(R.id.check_out_button);
+
+        // Finds the image view, starts the animation
+        ImageView scanImage = (ImageView) findViewById(R.id.iv_main_image);
+        scanImage.setBackgroundResource(R.drawable.animation);
+        tapAnimation = (AnimationDrawable) scanImage.getBackground();
+        tapAnimation.start();
 
         //Set the default texts
         if (!mNfcAdapter.isEnabled()) {
@@ -147,6 +157,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             notifyEndingSoon();
         }
 
+        // Starts animation
+        tapAnimation.start();
     }
 
     @Override
@@ -157,5 +169,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         stopForegroundDispatch(this, mNfcAdapter);
         unregisterReceiver(receiver);
         super.onPause();
+
+        // Stops animation
+        tapAnimation.stop();
     }
 }
