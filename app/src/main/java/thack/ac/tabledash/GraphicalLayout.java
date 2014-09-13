@@ -7,23 +7,33 @@ import android.graphics.Paint;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.util.ArrayList;
+
 public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callback {
 
     private GraphicsThread _thread;
 
-    private Paint _paintRed;
-    private Paint _paintGreen;
+    public static ArrayList<Table> tables;
 
     public GraphicalLayout(Context context) {
         super(context);
         getHolder().addCallback(this);
+
+        tables = new ArrayList<Table>();
+        tables.add(new Table(context, 30, 0, 0));
+        tables.add(new Table(context, 15, tables.get(0).getRect().width() + 40, 0));
+        tables.add(new Table(context, 5, 0, tables.get(0).getRect().height() + 40));
+        tables.add(new Table(context, 0, tables.get(0).getRect().width() + 40, tables.get(0).getRect().height() + 40));
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        canvas.drawCircle(canvas.getWidth()/2, (canvas.getHeight()/2) - 140, 60, _paintGreen);
-        canvas.drawCircle(canvas.getWidth()/2, canvas.getHeight()/2, 80, _paintRed);
-        canvas.drawCircle(canvas.getWidth()/2, (canvas.getHeight()/2) + 180, 100, _paintGreen);
+        // Clears the canvas
+        canvas.drawColor(Color.BLACK);
+
+        for(Table table : tables) {
+            canvas.drawBitmap(Table.bitmap, table.getRect().left, table.getRect().top, table.getPaint());
+        }
     }
 
     @Override
@@ -39,12 +49,6 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
         _thread = new GraphicsThread(getHolder(), this);
         _thread.setRunning(true);
         _thread.start();
-
-        _paintRed = new Paint(Paint.ANTI_ALIAS_FLAG);
-        _paintRed.setColor(Color.RED);
-
-        _paintGreen = new Paint(Paint.ANTI_ALIAS_FLAG);
-        _paintGreen.setColor(Color.GREEN);
     }
 
     @Override
