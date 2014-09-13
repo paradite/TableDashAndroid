@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -65,8 +66,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         registerReceiver(receiver, filter);
 
         // Handling of intent
-        String tag_ID = handleIntent(getIntent());
-        mStatusView.setText("Tag ID: " + tag_ID);
+        onNewIntent(getIntent());
     }
 
     @Override
@@ -100,5 +100,43 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 startActivity(new Intent(this, PickerActivity.class));
                 break;
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        /**
+         * This method gets called, when a new Intent gets associated with the current activity instance.
+         * Instead of creating a new activity, onNewIntent will be called. For more information have a look
+         * at the documentation.
+         *
+         * In our case this method gets called, when the user attaches a Tag to the device.
+         */
+        String tag_ID = handleIntent(intent);
+        Log.d(TAG, "ID:" + tag_ID);
+        if(tag_ID != null){
+            mStatusView.setText("Tag ID: " + tag_ID);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        /**
+         * It's important, that the activity is in the foreground (resumed). Otherwise
+         * an IllegalStateException is thrown.
+         */
+        registerReceiver(receiver, filter);
+        setupForegroundDispatch(this, mNfcAdapter);
+    }
+
+    @Override
+    protected void onPause() {
+        /**
+         * Call this before onPause, otherwise an IllegalArgumentException is thrown as well.
+         */
+        stopForegroundDispatch(this, mNfcAdapter);
+        unregisterReceiver(receiver);
+        super.onPause();
     }
 }

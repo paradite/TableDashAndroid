@@ -64,20 +64,28 @@ public class BaseActivity extends Activity {
             try {
                 byte[] tagId = tag.getId();
                 serialId = Helper.getHexString(tagId, tagId.length);
-                Log.d(TAG, "Direct Read - Serial Number: " + serialId);
             } catch (NullPointerException ex) {
                 ex.printStackTrace();
                 serialId = "ERROR";
             }
         }
+        Log.d(TAG, "Direct Read - Serial Number: " + serialId);
         return serialId;
+    }
+
+    /**
+     * @param activity The corresponding {@link MainActivity} requesting to stop the foreground dispatch.
+     * @param adapter  The {@link NfcAdapter} used for the foreground dispatch.
+     */
+    protected static void stopForegroundDispatch(final Activity activity, NfcAdapter adapter) {
+        adapter.disableForegroundDispatch(activity);
     }
 
     /**
      * @param activity The corresponding {@link Activity} requesting the foreground dispatch.
      * @param adapter  The {@link NfcAdapter} used for the foreground dispatch.
      */
-    private static void setupForegroundDispatch(final Activity activity, NfcAdapter adapter) {
+    protected static void setupForegroundDispatch(final Activity activity, NfcAdapter adapter) {
         final Intent intent = new Intent(activity.getApplicationContext(), activity.getClass());
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
@@ -105,28 +113,6 @@ public class BaseActivity extends Activity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        /**
-         * It's important, that the activity is in the foreground (resumed). Otherwise
-         * an IllegalStateException is thrown.
-         */
-        registerReceiver(receiver, filter);
-        setupForegroundDispatch(this, mNfcAdapter);
-    }
-
-    @Override
-    protected void onPause() {
-        /**
-         * Call this before onPause, otherwise an IllegalArgumentException is thrown as well.
-         */
-        stopForegroundDispatch(this, mNfcAdapter);
-        unregisterReceiver(receiver);
-        super.onPause();
-    }
-
-    @Override
     protected void onNewIntent(Intent intent) {
         /**
          * This method gets called, when a new Intent gets associated with the current activity instance.
@@ -138,13 +124,7 @@ public class BaseActivity extends Activity {
         handleIntent(intent);
     }
 
-    /**
-     * @param activity The corresponding {@link MainActivity} requesting to stop the foreground dispatch.
-     * @param adapter  The {@link NfcAdapter} used for the foreground dispatch.
-     */
-    private static void stopForegroundDispatch(final Activity activity, NfcAdapter adapter) {
-        adapter.disableForegroundDispatch(activity);
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
