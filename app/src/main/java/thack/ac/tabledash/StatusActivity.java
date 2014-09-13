@@ -131,10 +131,8 @@ public class StatusActivity extends BaseActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_graphical,
-                    container, false);
 
-            return rootView;
+            return new GraphicalLayout(getActivity());
         }
     }
 }

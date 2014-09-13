@@ -1,20 +1,10 @@
+<!-- A Blank Fragment for using canvas -->
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    
-    android:background = "#33CCFF"
-    
-    tools:context=".StatusActivity$GraphicalFragment" >
 
-    <ImageView
-        android:id="@+id/iv_Browse_builder"
-        android:contentDescription="@string/status_tab_graphical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:src="@drawable/cc_builder" />
-    
+    tools:context=".StatusActivity$GraphicalFragment" >
 </RelativeLayout>
