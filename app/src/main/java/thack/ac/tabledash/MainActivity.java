@@ -65,7 +65,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         registerReceiver(receiver, filter);
 
         // Handling of intent
-        handleIntent(getIntent());
+        String tag_ID = handleIntent(getIntent());
+        mStatusView.setText("Tag ID: " + tag_ID);
     }
 
     @Override
