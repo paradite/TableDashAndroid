@@ -10,6 +10,14 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radio_btn_10_minutes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/duration_10" />
+
         <RadioButton
             android:id="@+id/radio_btn_20_minutes"
             android:layout_width="wrap_content"

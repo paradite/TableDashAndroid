@@ -1,5 +1,7 @@
 package thack.ac.tabledash;
 
+import android.nfc.FormatException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -71,7 +73,7 @@ public class Helper {
      * @param date_received date received from server
      * @return Date for storing in local database
      */
-    public static Date parseDateFromServerToDate(String date_received) {
+    public static Date parseDateFromString(String date_received) {
         //2014-06-28 14:56:59
         SimpleDateFormat dateFormat_received = new SimpleDateFormat(
                 "yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault());
@@ -82,6 +84,36 @@ public class Helper {
             e.printStackTrace();
         }
         return date;
+    }
+
+    public static String parseDateToString(Date date_received) {
+        //2014-06-28 14:56:59
+        SimpleDateFormat dateFormat_received = new SimpleDateFormat(
+                "yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault());
+        String date_string = null;
+        date_string = dateFormat_received.format(date_received);
+        return date_string;
+    }
+
+    /**
+     * Check if eating is finished
+     *
+     * @param time_ending Date from the preference of the app
+     * @return true if finished
+     */
+    public static Boolean checkIfFinished(Date time_ending) {
+        Date date_current = new Date();
+        long seconds = (date_current.getTime() - time_ending.getTime()) / 1000;
+//        Log.e("Check, ", "time diff in seconds: " + seconds);
+//        Current time > Ending time => Finished eating session
+        return seconds > 0;
+    }
+
+    public static Boolean checkIfAlmostEnd(Date time_ending) {
+        Date date_current = new Date();
+        long seconds = (time_ending.getTime() - date_current.getTime()) / 1000;
+
+        return seconds > 0 && seconds < 5*60;
     }
 
 }

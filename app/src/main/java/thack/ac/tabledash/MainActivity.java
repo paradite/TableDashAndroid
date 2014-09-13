@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,11 +24,32 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         setContentView(R.layout.activity_main);
 
         mStatusView = (TextView) findViewById(R.id.tv_main_checkIn);
+        checkOutButton = findViewById(R.id.check_out_button);
 
         //Set the default texts
         if (!mNfcAdapter.isEnabled()) {
             mStatusView.setText("NFC is disabled. Please enable it in the settings to check in.");
         }
+
+//        Check if user is still eating
+//        Open pref storage
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        Check the pref storage ending time to see if still eating
+        if(preferences.contains(TAG_ENDING_TIME)){
+            String date_string = preferences.getString(TAG_ENDING_TIME, null);
+            if(date_string!=null){
+                ending_time = Helper.parseDateFromString(date_string);
+                Boolean eat_finished = Helper.checkIfFinished(ending_time);
+                if(!eat_finished){
+//                    Still eating, make the check out button visible and record the tag ID
+                    checkOutButton.setVisibility(View.VISIBLE);
+                    current_table_ID = preferences.getString(TAG_TABLE_ID, null);
+                }
+            }
+        }
+
+        Log.e(TAG, "Time: " + ending_time + " current TAG ID:" + current_table_ID);
+
 
         // Implement onClickListeners for clickable views
         findViewById(R.id.tv_main_checkStatus).setOnClickListener(this);
@@ -98,6 +120,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
                 // Launch main activity
                 startActivity(new Intent(this, PickerActivity.class));
+                break;
+            // Handle onClick for check out
+            case R.id.check_out_button:
+                checkOut();
                 break;
         }
     }

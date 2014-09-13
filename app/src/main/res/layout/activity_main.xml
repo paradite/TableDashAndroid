@@ -48,5 +48,15 @@
 
             android:clickable="true" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dialog_title_check_out"
+            android:id="@+id/check_out_button"
+            android:layout_below="@+id/tv_main_checkIn"
+            android:layout_centerHorizontal="true"
+            android:onClick="onClick"
+            android:visibility="invisible"/>
+
     </RelativeLayout>
  </FrameLayout>

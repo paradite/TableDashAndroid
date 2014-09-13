@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
@@ -19,12 +20,14 @@ import android.nfc.tech.NfcA;
 import android.nfc.tech.NfcB;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -34,6 +37,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -60,8 +65,17 @@ public class BaseActivity extends Activity {
     static String CHECK_OUT_URL = "checkout.php";
     static String CHECK_VAC_URL = "check_vacancy.php";
 
-//    Boolean to track if the user is currently is_eating
-    public boolean is_eating = false;
+//    Pref storage and variable to track if the user's estimated ending time && table tag ID
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
+    public Date ending_time;
+    public String current_table_ID;
+    public final String TAG_ENDING_TIME = "TAG_ENDING_TIME";
+    public final String TAG_TABLE_ID = "TAG_TABLE_ID";
+
+
+//    Button for checkout if present
+    public View checkOutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,13 +88,13 @@ public class BaseActivity extends Activity {
         android_id = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
+
         if (mNfcAdapter == null) {
             // Stop here, we definitely need NFC
             Toast.makeText(this, "This device doesn't support NFC.", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
-
         setContentView(R.layout.activity_base);
     }
 
@@ -96,7 +110,7 @@ public class BaseActivity extends Activity {
             String tech_IsoDep = IsoDep.class.getName();
             String tech_NfcB = NfcB.class.getName();
             String tech_Ndef = Ndef.class.getName();
-            Log.d(TAG, "tags: " + tag);
+//            Log.d(TAG, "tags: " + tag);
             // Get the ID directly
             try {
                 byte[] tagId = tag.getId();
@@ -106,7 +120,7 @@ public class BaseActivity extends Activity {
                 serialId = "ERROR";
             }
         }
-        Log.d(TAG, "Direct Read - Serial Number: " + serialId);
+//        Log.d(TAG, "Direct Read - Serial Number: " + serialId);
         return serialId;
     }
 
@@ -120,40 +134,64 @@ public class BaseActivity extends Activity {
          * In our case this method gets called, when the user attaches a Tag to the device.
          */
         final String tag_ID = handleIntent(intent);
-        Log.d(TAG, "ID:" + tag_ID);
+//        Log.d(TAG, "ID:" + tag_ID);
         if(tag_ID != null){
+            Log.e(TAG, "Time: " + ending_time + " current TAG ID:" + current_table_ID);
+
             Toast.makeText(this, "Tag ID: " + tag_ID, Toast.LENGTH_SHORT).show();
             AlertDialog.Builder alert = new AlertDialog.Builder(self);
-            alert.setTitle(getResources().getString(R.string.dialog_title_check_in));
 
             LayoutInflater inflater;
             inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-//            Use different durations for new check in and renewed check in
+//            Use different durations for new check in at new places and renewed check in
             LinearLayout ll;
-            if(is_eating){
-                ll = (LinearLayout) inflater.inflate(R.layout.re_check_in_dialog ,null);
+            String buttonConfirmText = "Check in!";
+            String buttonCancelText = "Cancel";
+            if(isEating() && tag_ID.equals(current_table_ID)){
+                if(almostEnd()){
+                    buttonConfirmText = "Extend";
+                    buttonCancelText = "No need";
+                    alert.setTitle(getResources().getString(R.string.dialog_title_re_check_in));
+                    ll = (LinearLayout) inflater.inflate(R.layout.re_check_in_dialog ,null);
+                    alert.setView(ll);
+                    alert.setMessage(R.string.dialog_message_re_check_in);
+                }else{
+                    buttonConfirmText = "Modify";
+                    buttonCancelText = "Cancel";
+                    alert.setTitle(getResources().getString(R.string.dialog_title_modify));
+                    ll = (LinearLayout) inflater.inflate(R.layout.check_in_dialog ,null);
+                    alert.setView(ll);
+                    alert.setMessage(R.string.dialog_message_modify);
+                }
+
             }else{
+                alert.setTitle(getResources().getString(R.string.dialog_title_check_in));
                 ll = (LinearLayout) inflater.inflate(R.layout.check_in_dialog ,null);
+                alert.setView(ll);
+                alert.setMessage(R.string.dialog_message_check_in);
             }
 
-            alert.setView(ll);
             final RadioGroup rg1=(RadioGroup)ll.findViewById(R.id.durations_rg);
 
-            alert.setPositiveButton("Check in!", new DialogInterface.OnClickListener() {
+            alert.setPositiveButton(buttonConfirmText, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     if(rg1.getCheckedRadioButtonId()!=-1){
                         String selection = getSelectionFromRadioGroup(rg1);
-
+                        int minutes = Integer.parseInt(selection);
                         //Add nameValuePair for http request
                         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
                         addToNameValuePairs(selection, nameValuePairs, tag_ID);
+//                        Update the variables
+                        updateEndingTime(minutes);
+                        updateTagID(tag_ID);
+                        Log.e(TAG, "Time: " + ending_time + " current TAG ID:" + current_table_ID + "after new check in");
                         new checkInAsync().execute(nameValuePairs);
                     }
                 }
             });
 
-            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            alert.setNegativeButton(buttonCancelText, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     // Canceled.
                 }
@@ -171,6 +209,10 @@ public class BaseActivity extends Activity {
                 //Add nameValuePair for http request
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
                 addToNameValuePairs(nameValuePairs);
+//                Update the ending time to now
+                updateEndingTime(0);
+//                Update the table ID to empty
+                updateTagID("");
                 new checkOutAsync().execute(nameValuePairs);
             }
         });
@@ -235,7 +277,6 @@ public class BaseActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            is_eating = true;
             dialog = new ProgressDialog(self);
             this.dialog.setMessage("Checking in");
             this.dialog.show();
@@ -247,6 +288,7 @@ public class BaseActivity extends Activity {
             // Creating service handler class instance
             sh = new ServiceHandler();
             String json = sh.makeServiceCall(PREFIX_URL + CHECK_IN_URL, ServiceHandler.POST, nameValuePairs);
+            Log.e(TAG, "Response: " + json);
             return null;
         }
 
@@ -255,6 +297,11 @@ public class BaseActivity extends Activity {
             super.onPostExecute(aVoid);
             if (dialog.isShowing()) {
                 dialog.dismiss();
+            }
+//            Make the check out button visible
+            checkOutButton = findViewById(R.id.check_out_button);
+            if(checkOutButton != null){
+                checkOutButton.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -268,7 +315,6 @@ public class BaseActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            is_eating = false;
             dialog = new ProgressDialog(self);
             this.dialog.setMessage("Checking out...");
             this.dialog.show();
@@ -280,6 +326,7 @@ public class BaseActivity extends Activity {
             // Creating service handler class instance
             sh = new ServiceHandler();
             String json = sh.makeServiceCall(PREFIX_URL + CHECK_OUT_URL, ServiceHandler.POST, nameValuePairs);
+            Log.e(TAG, "Response: " + json);
             return null;
         }
 
@@ -289,7 +336,41 @@ public class BaseActivity extends Activity {
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
+//            Make the check out button invisible
+            checkOutButton = findViewById(R.id.check_out_button);
+            if(checkOutButton != null){
+                checkOutButton.setVisibility(View.INVISIBLE);
+            }
         }
+    }
+
+    private void updateEndingTime(int minutes) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MINUTE, minutes);
+        ending_time = cal.getTime();
+        editor = preferences.edit();
+        editor.putString(TAG_ENDING_TIME, Helper.parseDateToString(ending_time));
+        editor.commit();
+    }
+
+    private void updateTagID(String tag_ID) {
+        editor = preferences.edit();
+        editor.putString(TAG_TABLE_ID, tag_ID);
+        editor.commit();
+    }
+
+    public Boolean isEating(){
+        if(ending_time == null){
+            return false;
+        }
+        return !Helper.checkIfFinished(ending_time);
+    }
+
+    public Boolean almostEnd(){
+        if(ending_time == null){
+            return false;
+        }
+        return Helper.checkIfAlmostEnd(ending_time);
     }
 
     /**

@@ -30,7 +30,12 @@
     <string name="maintenance">Maintenance</string>
 
     <!--Check-in Dialog Strings-->
+    <string name="dialog_title_re_check_in">Not done yet!</string>
+    <string name="dialog_message_re_check_in">I think I will finish in</string>
     <string name="dialog_title_check_in">Check in</string>
+    <string name="dialog_message_check_in">I should be able to finish in</string>
+    <string name="dialog_title_modify">I changed my mind</string>
+    <string name="dialog_message_modify">I should be able to finish in</string>
     <string name="dialog_title_check_out">Check out</string>
     <string name="duration_5">5</string>
     <string name="duration_10">10</string>
