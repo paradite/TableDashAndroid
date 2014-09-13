@@ -19,6 +19,8 @@ public class PickerActivity extends BaseActivity implements OnClickListener {
         findViewById(R.id.radio_btn_Canteen_A).setOnClickListener(this);
         findViewById(R.id.radio_btn_Canteen_B).setOnClickListener(this);
         findViewById(R.id.radio_btn_Canteen_C).setOnClickListener(this);
+
+        findViewById(R.id.btn_picker_check_status).setOnClickListener(this);
     }
 
     @Override
@@ -53,6 +55,8 @@ public class PickerActivity extends BaseActivity implements OnClickListener {
             case R.id.radio_btn_Canteen_C:
                 Toast.makeText(getApplicationContext(), "Canteen C", Toast.LENGTH_SHORT).show();
                 break;
+            case R.id.btn_picker_check_status:
+                startActivity(new Intent(this, StatusActivity.class));
         }
     }
 }

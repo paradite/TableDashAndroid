@@ -15,5 +15,18 @@
     <string name="location_canteen_a">Canteen A</string>
     <string name="location_canteen_b">Canteen B</string>
     <string name="location_canteen_c">Canteen C</string>
+    <string name="picker_check_status">Check status</string>
+
+    <!-- Status Activity Strings -->
+    <string name="status_tab_statistics">Geek Stats</string>
+    <string name="status_tab_graphical">Graphical Layout</string>
+
+    <!-- Statistics Fragment Strings -->
+    <string name="loading_statistics">Loading statistics..</string>
+    <string name="still_loading">Still loading..</string>
+
+    <!-- Graphical Fragment Strings -->
+    <string name="work_in_progress">Work in progress!</string>
+    <string name="maintenance">Maintenance</string>
 
 </resources>
