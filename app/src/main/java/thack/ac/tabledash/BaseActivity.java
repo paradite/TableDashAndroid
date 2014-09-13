@@ -16,6 +16,7 @@ import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
 import android.nfc.tech.NfcA;
 import android.nfc.tech.NfcB;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -146,10 +147,7 @@ public class BaseActivity extends Activity {
                         param_value= selection;
                         nameValuePairs.add(new BasicNameValuePair(param_name, param_value));
 
-                        // Creating service handler class instance
-                        sh = new ServiceHandler();
 
-                        String json = sh.makeServiceCall(CHECK_IN_URL, ServiceHandler.GET, nameValuePairs);
                     }
                 }
             });
@@ -161,6 +159,17 @@ public class BaseActivity extends Activity {
             });
 
             alert.show();
+        }
+    }
+
+    protected class SentCount extends AsyncTask<List<NameValuePair>, Void, Void>{
+
+        @Override
+        protected Void doInBackground(List<NameValuePair>... lists) {
+            // Creating service handler class instance
+            sh = new ServiceHandler();
+            String json = sh.makeServiceCall(CHECK_IN_URL, ServiceHandler.GET, nameValuePairs);
+            return null;
         }
     }
 
