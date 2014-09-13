@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends BaseActivity implements OnClickListener {
-    private TextView mStatusView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +37,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 //        Check the pref storage ending time to see if still eating
         if(preferences.contains(TAG_ENDING_TIME)){
             String date_string = preferences.getString(TAG_ENDING_TIME, null);
+            String notification_string = preferences.getString(TAG_NOTIFICATION_TIME, null);
             if(date_string!=null){
                 ending_time = Helper.parseDateFromString(date_string);
+                notification_time = Helper.parseDateFromString(notification_string);
                 Boolean eat_finished = Helper.checkIfFinished(ending_time);
                 if(!eat_finished){
 //                    Still eating, make the check out button visible and record the tag ID
@@ -123,7 +125,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 break;
             // Handle onClick for check out
             case R.id.check_out_button:
-                checkOut();
+                checkOut(true);
                 break;
         }
     }
@@ -138,6 +140,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
          */
         registerReceiver(receiver, filter);
         setupForegroundDispatch(this, mNfcAdapter);
+        if(isEating()){
+            notifyEating();
+        }
+        if(isEating() && almostEnd() && current_table_ID!= null && !current_table_ID.equals("")){
+            notifyEndingSoon();
+        }
+
     }
 
     @Override

@@ -21,17 +21,17 @@ import android.nfc.tech.NfcA;
 import android.nfc.tech.NfcB;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.NameValuePair;
@@ -54,6 +54,10 @@ public class BaseActivity extends Activity {
     //Service Handler
     ServiceHandler sh = new ServiceHandler();
 
+    Handler handler=new Handler();
+    Runnable r;
+    Runnable r2;
+
 //    Android ID
     private String android_id;
 
@@ -66,18 +70,23 @@ public class BaseActivity extends Activity {
     static String CHECK_OUT_URL = "checkout.php";
     static String CHECK_VAC_URL = "check_vacancy.php";
 
+//    Threshold
+    public final double PERCENTAGE = 0.8;
+
 //    Pref storage and variable to track if the user's estimated ending time && table tag ID
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
+    public Date notification_time;
     public Date ending_time;
     public String current_table_ID;
     public final String TAG_ENDING_TIME = "TAG_ENDING_TIME";
+    public final String TAG_NOTIFICATION_TIME = "TAG_NOTIFICATION_TIME";
     public final String TAG_TABLE_ID = "TAG_TABLE_ID";
 
 
 //    Button for checkout if present
     public View checkOutButton;
-
+    public TextView mStatusView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,11 +193,31 @@ public class BaseActivity extends Activity {
                         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
                         addToNameValuePairs(selection, nameValuePairs, tag_ID);
 //                        Update the variables
-                        updateEndingTime(minutes);
+                        int notification_seconds = (int)(minutes*60*PERCENTAGE);
+                        int total_seconds = minutes*60;
+                        updateNotificationAndEndingTime(notification_seconds, total_seconds);
                         updateTagID(tag_ID);
+                        notifyEating();
 //                        Set up scheduled notification
                         createScheduledNotification(minutes);
-
+//                        Remove previous handlers
+                        handler.removeCallbacks(r);
+//                        Log out user after time passed in case the activity does not gets closed
+                        final int delay = 1000 * total_seconds;
+                        final int notification_delay = 1000 * notification_seconds;
+                        r = new Runnable() {
+                            public void run() {
+                                checkOut(false);
+                            }
+                        };
+                        r2 = new Runnable() {
+                            public void run() {
+                                Log.e(TAG, "Runnable!");
+                                notifyEndingSoon();
+                            }
+                        };
+                        handler.postDelayed(r, delay);
+                        handler.postDelayed(r2, notification_delay);
                         Log.e(TAG, "Time: " + ending_time + " current TAG ID:" + current_table_ID + "after new check in");
                         new checkInAsync().execute(nameValuePairs);
                     }
@@ -205,29 +234,35 @@ public class BaseActivity extends Activity {
         }
     }
 
-    public void checkOut(){
-        AlertDialog.Builder alert = new AlertDialog.Builder(self);
-        alert.setTitle(getResources().getString(R.string.dialog_title_check_out));
-        alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                //Add nameValuePair for http request
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-                addToNameValuePairs(nameValuePairs);
-//                Update the ending time to now
-                updateEndingTime(0);
-//                Update the table ID to empty
-                updateTagID("");
-                new checkOutAsync().execute(nameValuePairs);
-            }
-        });
+    public void checkOut(Boolean confirmation){
+        if(confirmation){
+            AlertDialog.Builder alert = new AlertDialog.Builder(self);
+            alert.setTitle(getResources().getString(R.string.dialog_title_check_out));
+            alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    //Add nameValuePair for http request
+                    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                    addToNameValuePairs(nameValuePairs);
+                    notifyCheckedOut();
+                    new checkOutAsync().execute(nameValuePairs);
+                }
+            });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // Canceled.
-            }
-        });
+            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Canceled.
+                }
+            });
 
-        alert.show();
+            alert.show();
+        }else{
+            //Add nameValuePair for http request
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            addToNameValuePairs(nameValuePairs);
+            notifyCheckedOut();
+            new checkOutAsync().execute(nameValuePairs);
+        }
+
     }
 
     /**
@@ -351,7 +386,7 @@ public class BaseActivity extends Activity {
     private void createScheduledNotification(int minutes)
     {
 //        Schedule a notification at 80% time
-        int scheduled_seconds = (int)(minutes * 60 * 0.8);
+        int scheduled_seconds = (int)(minutes * 60 * PERCENTAGE);
         // Get new calendar object and set the date to now
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -373,18 +408,31 @@ public class BaseActivity extends Activity {
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 
-    private void updateEndingTime(int minutes) {
+    private void updateNotificationAndEndingTime(int notification_seconds, int total_seconds) {
+        int remaining_seconds = total_seconds - notification_seconds;
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.MINUTE, minutes);
+        cal.add(Calendar.SECOND, notification_seconds);
+        notification_time = cal.getTime();
+        cal.add(Calendar.SECOND, remaining_seconds);
         ending_time = cal.getTime();
         editor = preferences.edit();
         editor.putString(TAG_ENDING_TIME, Helper.parseDateToString(ending_time));
+        editor.putString(TAG_NOTIFICATION_TIME, Helper.parseDateToString(notification_time));
         editor.commit();
     }
 
+
+
     private void updateTagID(String tag_ID) {
+        current_table_ID = tag_ID;
         editor = preferences.edit();
         editor.putString(TAG_TABLE_ID, tag_ID);
+        editor.commit();
+    }
+
+    private void clearPref() {
+        editor = preferences.edit();
+        editor.clear();
         editor.commit();
     }
 
@@ -396,10 +444,31 @@ public class BaseActivity extends Activity {
     }
 
     public Boolean almostEnd(){
+        if(ending_time == null || !isEating()){
+            return false;
+        }
+        return Helper.checkIfAlmostEnd(notification_time);
+    }
+
+    public Boolean alreadyFinished(){
         if(ending_time == null){
             return false;
         }
-        return Helper.checkIfAlmostEnd(ending_time);
+        return Helper.checkIfFinished(ending_time);
+    }
+
+    public void notifyEndingSoon() {
+        if(mStatusView != null){
+            mStatusView.setText("Haven't finished yet? Tap again to extend.");
+        }else{
+            Toast.makeText(this, "Haven't finished yet? Tap again to extend.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void notifyEating() {
+        if(mStatusView != null) {
+            mStatusView.setText("Enjoy your food!");
+        }
     }
 
     /**
@@ -445,60 +514,46 @@ public class BaseActivity extends Activity {
     protected void onResume() {
         super.onResume();
         setupForegroundDispatch(this, mNfcAdapter);
-        Log.e(TAG, "");
-        if(isEating() && almostEnd() && current_table_ID!= null && !current_table_ID.equals("")){
-            AlertDialog.Builder alert = new AlertDialog.Builder(self);
-
-            LayoutInflater inflater;
-            inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-//            Use different durations for new check in at new places and renewed check in
-            LinearLayout ll;
-            String buttonConfirmText;
-            String buttonCancelText;
-            buttonConfirmText = "Extend";
-            buttonCancelText = "No need";
-            alert.setTitle(getResources().getString(R.string.dialog_title_re_check_in));
-            ll = (LinearLayout) inflater.inflate(R.layout.re_check_in_dialog ,null);
-            alert.setView(ll);
-            alert.setMessage(R.string.dialog_message_re_check_in);
-
-            final RadioGroup rg1=(RadioGroup)ll.findViewById(R.id.durations_rg);
-
-            alert.setPositiveButton(buttonConfirmText, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    if(rg1.getCheckedRadioButtonId()!=-1){
-                        String selection = getSelectionFromRadioGroup(rg1);
-                        int minutes = Integer.parseInt(selection);
-                        //Add nameValuePair for http request
-                        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-                        addToNameValuePairs(selection, nameValuePairs, current_table_ID);
-//                        Update the variables
-                        updateEndingTime(minutes);
-                        updateTagID(current_table_ID);
-//                        Set up scheduled notification
-                        createScheduledNotification(minutes);
-
-                        Log.e(TAG, "Time: " + ending_time + " current TAG ID:" + current_table_ID + "after new check in");
-                        new checkInAsync().execute(nameValuePairs);
-                    }
-                }
-            });
-
-            alert.setNegativeButton(buttonCancelText, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Canceled.
-                }
-            });
-
-            alert.show();
+        if(alreadyFinished()){
+            notifyCheckedOut();
         }
+
+//        Remove previous handlers
+        handler.removeCallbacks(r);
+
+        if(isEating()){
+            //        Log out user after time passed in case the activity does not gets closed
+            final int delay = 1000 * (int)(ending_time.getTime() - Calendar.getInstance().getTime().getTime());
+            final int notification_delay = 1000 * (int)(notification_time.getTime() - Calendar.getInstance().getTime().getTime());
+            r = new Runnable() {
+                public void run() {
+                    checkOut(false);
+                }
+            };
+            r2 = new Runnable() {
+                public void run() {
+                    Log.e(TAG, "Runnable!");
+                    notifyEndingSoon();
+                }
+            };
+            handler.postDelayed(r, delay);
+            handler.postDelayed(r2, notification_delay);
+        }
+
+    }
+
+    private void notifyCheckedOut() {
+        Toast.makeText(this, "You have been checked out.", Toast.LENGTH_LONG).show();
+        clearPref();
+        self.recreate();
     }
 
     @Override
     protected void onPause() {
         stopForegroundDispatch(this, mNfcAdapter);
         super.onPause();
+//        Remove previous handlers
+        handler.removeCallbacks(r);
     }
 
     @Override

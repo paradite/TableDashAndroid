@@ -109,11 +109,9 @@ public class Helper {
         return seconds > 0;
     }
 
-    public static Boolean checkIfAlmostEnd(Date time_ending) {
+    public static Boolean checkIfAlmostEnd(Date time_notification) {
         Date date_current = new Date();
-        long seconds = (time_ending.getTime() - date_current.getTime()) / 1000;
-
-        return seconds > 0 && seconds < 5*60;
+        return (date_current.getTime() - time_notification.getTime()) > 0;
     }
 
 }
