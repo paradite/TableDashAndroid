@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/TableDash.iml" filepath="$PROJECT_DIR$/TableDash.iml" />
       <module fileurl="file://$PROJECT_DIR$/TableDashAndroid.iml" filepath="$PROJECT_DIR$/TableDashAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

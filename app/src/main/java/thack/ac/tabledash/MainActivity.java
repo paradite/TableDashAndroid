@@ -1,22 +1,71 @@
 package thack.ac.tabledash;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends BaseActivity implements OnClickListener {
+    private TextView mStatusView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mStatusView = (TextView) findViewById(R.id.tv_main_checkIn);
+
+        //Set the default texts
+        if (!mNfcAdapter.isEnabled()) {
+            mStatusView.setText("NFC is disabled. Please enable it in the settings to check in.");
+        }
+
         // Implement onClickListeners for clickable views
         findViewById(R.id.tv_main_checkStatus).setOnClickListener(this);
+
+
+        // Handle changes in NFC state
+        filter = new IntentFilter(NfcAdapter.ACTION_ADAPTER_STATE_CHANGED);
+        receiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final String action = intent.getAction();
+                if (action.equals(NfcAdapter.ACTION_ADAPTER_STATE_CHANGED)) {
+                    final int state = intent.getIntExtra(NfcAdapter.EXTRA_ADAPTER_STATE,
+                            NfcAdapter.STATE_OFF);
+                    switch (state) {
+                        case NfcAdapter.STATE_OFF:
+                            Toast.makeText(MainActivity.this, "NFC disabled.", Toast.LENGTH_SHORT).show();
+                            mStatusView.setText("NFC is disabled. Please enable it in the settings.");
+                            break;
+                        case NfcAdapter.STATE_TURNING_OFF:
+//                            Toast.makeText(MainActivity.this, "NFC enabled.", Toast.LENGTH_SHORT).show();
+                            break;
+                        case NfcAdapter.STATE_ON:
+                            Toast.makeText(MainActivity.this, "NFC enabled.", Toast.LENGTH_SHORT).show();
+                            mStatusView.setText(R.string.tap_card);
+                            break;
+                        case NfcAdapter.STATE_TURNING_ON:
+//                            Toast.makeText(MainActivity.this, "NFC enabled.", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                }
+
+            }
+        };
+        registerReceiver(receiver, filter);
+
+        // Handling of intent
+        handleIntent(getIntent());
     }
 
     @Override
