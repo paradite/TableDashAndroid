@@ -103,22 +103,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        /**
-         * This method gets called, when a new Intent gets associated with the current activity instance.
-         * Instead of creating a new activity, onNewIntent will be called. For more information have a look
-         * at the documentation.
-         *
-         * In our case this method gets called, when the user attaches a Tag to the device.
-         */
-        String tag_ID = handleIntent(intent);
-        Log.d(TAG, "ID:" + tag_ID);
-        if(tag_ID != null){
-            mStatusView.setText("Tag ID: " + tag_ID);
-        }
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
 

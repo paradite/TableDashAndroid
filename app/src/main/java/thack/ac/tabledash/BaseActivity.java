@@ -73,6 +73,22 @@ public class BaseActivity extends Activity {
         return serialId;
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        /**
+         * This method gets called, when a new Intent gets associated with the current activity instance.
+         * Instead of creating a new activity, onNewIntent will be called. For more information have a look
+         * at the documentation.
+         *
+         * In our case this method gets called, when the user attaches a Tag to the device.
+         */
+        String tag_ID = handleIntent(intent);
+        Log.d(TAG, "ID:" + tag_ID);
+        if(tag_ID != null){
+            Toast.makeText(this, "Tag ID: " + tag_ID, Toast.LENGTH_LONG).show();
+        }
+    }
+
     /**
      * @param activity The corresponding {@link MainActivity} requesting to stop the foreground dispatch.
      * @param adapter  The {@link NfcAdapter} used for the foreground dispatch.
@@ -113,18 +129,16 @@ public class BaseActivity extends Activity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        /**
-         * This method gets called, when a new Intent gets associated with the current activity instance.
-         * Instead of creating a new activity, onNewIntent will be called. For more information have a look
-         * at the documentation.
-         *
-         * In our case this method gets called, when the user attaches a Tag to the device.
-         */
-        handleIntent(intent);
+    protected void onResume() {
+        super.onResume();
+        setupForegroundDispatch(this, mNfcAdapter);
     }
 
-
+    @Override
+    protected void onPause() {
+        stopForegroundDispatch(this, mNfcAdapter);
+        super.onPause();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
