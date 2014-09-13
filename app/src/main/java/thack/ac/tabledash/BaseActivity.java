@@ -3,6 +3,7 @@ package thack.ac.tabledash;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,6 +19,7 @@ import android.nfc.tech.NfcA;
 import android.nfc.tech.NfcB;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,7 +34,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -44,15 +45,23 @@ public class BaseActivity extends Activity {
     public BroadcastReceiver receiver;
     public IntentFilter filter;
 
-    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-
     //Service Handler
     ServiceHandler sh = new ServiceHandler();
+
+//    Android ID
+    private String android_id;
 
     /**
      * Urls for server communications
      */
-    static String CHECK_IN_URL = "http://tabledash.ml/checkin.php";
+//    static String PREFIX_URL = "http://tabledash.ml/";
+    static String PREFIX_URL = "http://192.168.50.224/tabledashserver/";
+    static String CHECK_IN_URL = "checkin.php";
+    static String CHECK_OUT_URL = "checkout.php";
+    static String CHECK_VAC_URL = "check_vacancy.php";
+
+//    Boolean to track if the user is currently is_eating
+    public boolean is_eating = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +69,10 @@ public class BaseActivity extends Activity {
 
         // Set up NFC Adapter
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+//        Get Android ID
+        android_id = Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ANDROID_ID);
 
         if (mNfcAdapter == null) {
             // Stop here, we definitely need NFC
@@ -106,7 +119,7 @@ public class BaseActivity extends Activity {
          *
          * In our case this method gets called, when the user attaches a Tag to the device.
          */
-        String tag_ID = handleIntent(intent);
+        final String tag_ID = handleIntent(intent);
         Log.d(TAG, "ID:" + tag_ID);
         if(tag_ID != null){
             Toast.makeText(this, "Tag ID: " + tag_ID, Toast.LENGTH_SHORT).show();
@@ -115,39 +128,27 @@ public class BaseActivity extends Activity {
 
             LayoutInflater inflater;
             inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            LinearLayout ll = (LinearLayout) inflater.inflate(R.layout.check_in_dialog ,null);
+
+//            Use different durations for new check in and renewed check in
+            LinearLayout ll;
+            if(is_eating){
+                ll = (LinearLayout) inflater.inflate(R.layout.re_check_in_dialog ,null);
+            }else{
+                ll = (LinearLayout) inflater.inflate(R.layout.check_in_dialog ,null);
+            }
 
             alert.setView(ll);
             final RadioGroup rg1=(RadioGroup)ll.findViewById(R.id.durations_rg);
 
             alert.setPositiveButton("Check in!", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-//                Log.d(TAG, "activity: " + activity.getClass());
-//                Log.d(TAG, "rg: " + rg1);
                     if(rg1.getCheckedRadioButtonId()!=-1){
-                        int id= rg1.getCheckedRadioButtonId();
-                        View radioButton = rg1.findViewById(id);
-                        int radioId = rg1.indexOfChild(radioButton);
-                        RadioButton btn = (RadioButton) rg1.getChildAt(radioId);
-                        String selection = (String) btn.getText();
-                        Toast.makeText(self, "You selected " + selection + " minutes.", Toast.LENGTH_SHORT).show();
+                        String selection = getSelectionFromRadioGroup(rg1);
 
                         //Add nameValuePair for http request
                         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-                        String param_name;
-                        String param_value;
-
-                        param_name= "user_id";
-                        param_value= "zhuliang";
-                        nameValuePairs.add(new BasicNameValuePair(param_name, param_value));
-                        param_name= "tag_id";
-                        param_value= "tag_ID";
-                        nameValuePairs.add(new BasicNameValuePair(param_name, param_value));
-                        param_name= "duration";
-                        param_value= selection;
-                        nameValuePairs.add(new BasicNameValuePair(param_name, param_value));
-
-
+                        addToNameValuePairs(selection, nameValuePairs, tag_ID);
+                        new checkInAsync().execute(nameValuePairs);
                     }
                 }
             });
@@ -162,14 +163,132 @@ public class BaseActivity extends Activity {
         }
     }
 
-    protected class SentCount extends AsyncTask<List<NameValuePair>, Void, Void>{
+    public void checkOut(){
+        AlertDialog.Builder alert = new AlertDialog.Builder(self);
+        alert.setTitle(getResources().getString(R.string.dialog_title_check_out));
+        alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //Add nameValuePair for http request
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                addToNameValuePairs(nameValuePairs);
+                new checkOutAsync().execute(nameValuePairs);
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
+    }
+
+    /**
+     * NameValuePair for Check in
+     * @param selection         Selected duration
+     * @param nameValuePairs    NameValuePair
+     * @param tag_ID            tag_ID
+     */
+    private void addToNameValuePairs(String selection, List<NameValuePair> nameValuePairs, String tag_ID) {
+        String param_name;
+        String param_value;
+        param_name= "user_id";
+        param_value= android_id;
+        nameValuePairs.add(new BasicNameValuePair(param_name, param_value));
+        param_name= "tag_id";
+        param_value= tag_ID;
+        nameValuePairs.add(new BasicNameValuePair(param_name, param_value));
+        param_name= "duration";
+        param_value= selection;
+        nameValuePairs.add(new BasicNameValuePair(param_name, param_value));
+    }
+
+    /**
+     * NameValuePair for Check out
+     * @param nameValuePairs    NameValuePair
+     */
+    private void addToNameValuePairs(List<NameValuePair> nameValuePairs) {
+        String param_name;
+        String param_value;
+        param_name= "user_id";
+        param_value= android_id;
+        nameValuePairs.add(new BasicNameValuePair(param_name, param_value));
+    }
+
+    private String getSelectionFromRadioGroup(RadioGroup rg1) {
+        int id= rg1.getCheckedRadioButtonId();
+        View radioButton = rg1.findViewById(id);
+        int radioId = rg1.indexOfChild(radioButton);
+        RadioButton btn = (RadioButton) rg1.getChildAt(radioId);
+        String selection = (String) btn.getText();
+        Toast.makeText(self, "You selected " + selection + " minutes.", Toast.LENGTH_SHORT).show();
+        return selection;
+    }
+
+    /**
+     * AsyncTask for checking in
+     */
+    private class checkInAsync extends AsyncTask<List<NameValuePair>, Void, Void>{
+        private ProgressDialog dialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            is_eating = true;
+            dialog = new ProgressDialog(self);
+            this.dialog.setMessage("Checking in");
+            this.dialog.show();
+        }
 
         @Override
         protected Void doInBackground(List<NameValuePair>... lists) {
+            List<NameValuePair> nameValuePairs = lists[0];
             // Creating service handler class instance
             sh = new ServiceHandler();
-            String json = sh.makeServiceCall(CHECK_IN_URL, ServiceHandler.GET, nameValuePairs);
+            String json = sh.makeServiceCall(PREFIX_URL + CHECK_IN_URL, ServiceHandler.POST, nameValuePairs);
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }
+    }
+
+    /**
+     * AsyncTask for checking out
+     */
+    private class checkOutAsync extends AsyncTask<List<NameValuePair>, Void, Void>{
+        private ProgressDialog dialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            is_eating = false;
+            dialog = new ProgressDialog(self);
+            this.dialog.setMessage("Checking out...");
+            this.dialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(List<NameValuePair>... lists) {
+            List<NameValuePair> nameValuePairs = lists[0];
+            // Creating service handler class instance
+            sh = new ServiceHandler();
+            String json = sh.makeServiceCall(PREFIX_URL + CHECK_OUT_URL, ServiceHandler.POST, nameValuePairs);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
         }
     }
 

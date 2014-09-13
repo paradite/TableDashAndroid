@@ -31,6 +31,7 @@
 
     <!--Check-in Dialog Strings-->
     <string name="dialog_title_check_in">Check in</string>
+    <string name="dialog_title_check_out">Check out</string>
     <string name="duration_5">5</string>
     <string name="duration_10">10</string>
     <string name="duration_20">20</string>

@@ -1,7 +1,10 @@
 package thack.ac.tabledash;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Class to provide general useful methods
@@ -60,6 +63,25 @@ public class Helper {
 //        Log.i(TAG, sdf.format(cal.getTime()));
         String end = sdf.format(cal.getTime());
         return start + " to " + end;
+    }
+
+    /**
+     * Parse the date from server to String for local database
+     *
+     * @param date_received date received from server
+     * @return Date for storing in local database
+     */
+    public static Date parseDateFromServerToDate(String date_received) {
+        //2014-06-28 14:56:59
+        SimpleDateFormat dateFormat_received = new SimpleDateFormat(
+                "yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault());
+        Date date = null;
+        try {
+            date = dateFormat_received.parse(date_received);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
     }
 
 }

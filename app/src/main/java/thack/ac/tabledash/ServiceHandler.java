@@ -72,6 +72,7 @@ import java.util.List;
 
                 // Checking http request method type
                 if (method == POST) {
+                    Log.e("POST: ", "> " + url);
                     HttpPost httpPost = new HttpPost(url);
                     // adding post params
                     if (params != null) {
@@ -87,7 +88,7 @@ import java.util.List;
                                 .format(params, "utf-8");
                         url += "?" + paramString;
                     }
-                    Log.e("Request: ", "> " + url);
+                    Log.e("GET: ", "> " + url);
                     HttpGet httpGet = new HttpGet(url);
 
                     httpResponse = httpClient.execute(httpGet);
