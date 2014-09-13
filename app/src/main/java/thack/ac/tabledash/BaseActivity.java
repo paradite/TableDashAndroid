@@ -11,6 +11,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.AnimationDrawable;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
@@ -28,6 +30,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -36,6 +39,9 @@ import android.widget.Toast;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -87,6 +93,11 @@ public class BaseActivity extends Activity {
 //    Button for checkout if present
     public View checkOutButton;
     public TextView mStatusView;
+    public AnimationDrawable tapAnimation;
+
+//    String for JSON
+    public String json;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -243,7 +254,7 @@ public class BaseActivity extends Activity {
                     //Add nameValuePair for http request
                     List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
                     addToNameValuePairs(nameValuePairs);
-                    notifyCheckedOut();
+                    notifyCheckedOut(self);
                     new checkOutAsync().execute(nameValuePairs);
                 }
             });
@@ -256,10 +267,11 @@ public class BaseActivity extends Activity {
 
             alert.show();
         }else{
+            Log.e(TAG, "checkout before Async: ");
             //Add nameValuePair for http request
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
             addToNameValuePairs(nameValuePairs);
-            notifyCheckedOut();
+            notifyCheckedOut(self);
             new checkOutAsync().execute(nameValuePairs);
         }
 
@@ -383,6 +395,44 @@ public class BaseActivity extends Activity {
         }
     }
 
+    /**
+     * AsyncTask for checking vacancy
+     */
+    public class checkVacancyAsync extends AsyncTask<List<NameValuePair>, Void, String>{
+        private ProgressDialog dialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog = new ProgressDialog(self);
+            this.dialog.setMessage("Checking vacancy...");
+            this.dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(List<NameValuePair>... lists) {
+            List<NameValuePair> nameValuePairs = lists[0];
+            // Creating service handler class instance
+            sh = new ServiceHandler();
+            json = sh.makeServiceCall(PREFIX_URL + CHECK_VAC_URL, ServiceHandler.POST, nameValuePairs);
+            Log.e(TAG, "Response: " + json);
+
+
+            return json;
+        }
+
+        @Override
+        protected void onPostExecute(String json) {
+            super.onPostExecute(json);
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+            Intent newintent = new Intent(self, StatusActivity.class);
+            startActivity(newintent);
+        }
+    }
+
+
     private void createScheduledNotification(int minutes)
     {
 //        Schedule a notification at 80% time
@@ -458,6 +508,7 @@ public class BaseActivity extends Activity {
     }
 
     public void notifyEndingSoon() {
+        Log.e(TAG, "status: " + mStatusView);
         if(mStatusView != null){
             mStatusView.setText("Haven't finished yet? Tap again to extend.");
         }else{
@@ -468,6 +519,13 @@ public class BaseActivity extends Activity {
     public void notifyEating() {
         if(mStatusView != null) {
             mStatusView.setText("Enjoy your food!");
+        }
+        // Finds the image view, starts the animation
+        ImageView scanImage = (ImageView) findViewById(R.id.iv_main_image);
+        if(scanImage != null){
+            tapAnimation = (AnimationDrawable) scanImage.getBackground();
+            tapAnimation.stop();
+            scanImage.setBackgroundResource(R.drawable.enjoy_your_meal);
         }
     }
 
@@ -515,7 +573,7 @@ public class BaseActivity extends Activity {
         super.onResume();
         setupForegroundDispatch(this, mNfcAdapter);
         if(alreadyFinished()){
-            notifyCheckedOut();
+            notifyCheckedOut(self);
         }
 
 //        Remove previous handlers
@@ -542,10 +600,17 @@ public class BaseActivity extends Activity {
 
     }
 
-    private void notifyCheckedOut() {
+    private void notifyCheckedOut(Activity activity) {
         Toast.makeText(this, "You have been checked out.", Toast.LENGTH_LONG).show();
         clearPref();
-        self.recreate();
+        activity.recreate();
+        // Finds the image view, starts the animation
+        ImageView scanImage = (ImageView) findViewById(R.id.iv_main_image);
+        if(scanImage!=null){
+            scanImage.setBackgroundResource(R.drawable.animation);
+            tapAnimation = (AnimationDrawable) scanImage.getBackground();
+            tapAnimation.start();
+        }
     }
 
     @Override

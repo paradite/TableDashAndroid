@@ -56,7 +56,7 @@ public class PickerActivity extends BaseActivity implements OnClickListener {
                 Toast.makeText(getApplicationContext(), "Canteen C", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_picker_check_status:
-                startActivity(new Intent(this, StatusActivity.class));
+                new checkVacancyAsync().execute();
         }
     }
 }

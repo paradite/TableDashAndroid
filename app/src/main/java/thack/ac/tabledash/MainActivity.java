@@ -20,7 +20,7 @@ import android.widget.Toast;
 public class MainActivity extends BaseActivity implements OnClickListener {
 
 
-    private AnimationDrawable tapAnimation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

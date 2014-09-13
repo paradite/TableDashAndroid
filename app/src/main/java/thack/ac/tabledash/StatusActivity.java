@@ -14,19 +14,47 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
 
 public class StatusActivity extends BaseActivity {
-
     public static ArrayList<Table> tables = null;
-
+    StatusActivity self = this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Create tables
-        tables = new ArrayList<Table>();
+        //Format the JSON for tables
+        //Wrapper JSONArray
+        JSONArray wrapperJSON = null;
+        tables= new ArrayList<Table>();
+        if (json != null) {
+            try {
+                wrapperJSON = new JSONArray(json);
+                int x[] = new int[]{80, 600, 80, 600};
+                int y[] = new int[]{80, 80, 600, 600};
+
+                //Add new experiments into database
+                int length = 0;
+                if (wrapperJSON.length() > 0) {
+                    length = wrapperJSON.length();
+                    for (int i = 0; i < length; i++) {
+                        JSONArray table = wrapperJSON.getJSONArray(i);
+                        String tag_ID = table.getString(0);
+                        String table_ID = table.getString(1);
+                        String ending_time = table.getString(2);
+                        int duration = Integer.parseInt(ending_time);
+                        tables.add(new Table(this, tag_ID, duration, x[i], y[i]));
+                    }
+                }
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 
         // Setup action bar for tabs
         ActionBar actionBar = getActionBar();
@@ -68,9 +96,13 @@ public class StatusActivity extends BaseActivity {
         {
             case R.id.action_update:
                 // Update statistics & graphical layout fragments
-                for(Table table : tables)
-                {
-                }
+                new checkVacancyAsync().execute();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        self.recreate();
+                    }
+                }, 2000);
                 break;
         }
         return super.onOptionsItemSelected(item);
