@@ -6,4 +6,14 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_base">BaseActivity</string>
 
+    <!-- Main Activity Strings -->
+    <string name="tap_card">Tap your card to check in</string>
+    <string name="check_status"><u>Check canteen status</u></string>
+
+    <!-- Picker Activity Strings -->
+    <string name="pick_location">Pick a location:</string>
+    <string name="location_canteen_a">Canteen A</string>
+    <string name="location_canteen_b">Canteen B</string>
+    <string name="location_canteen_c">Canteen C</string>
+
 </resources>

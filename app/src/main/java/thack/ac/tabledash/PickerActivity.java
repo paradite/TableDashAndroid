@@ -8,15 +8,17 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
-public class MainActivity extends BaseActivity implements OnClickListener {
+public class PickerActivity extends BaseActivity implements OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_picker);
 
         // Implement onClickListeners for clickable views
-        findViewById(R.id.tv_main_checkStatus).setOnClickListener(this);
+        findViewById(R.id.radio_btn_Canteen_A).setOnClickListener(this);
+        findViewById(R.id.radio_btn_Canteen_B).setOnClickListener(this);
+        findViewById(R.id.radio_btn_Canteen_C).setOnClickListener(this);
     }
 
     @Override
@@ -39,15 +41,17 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     }
 
     @Override
-    public void onClick(View v) {
-        switch(v.getId())
+    public void onClick(View view) {
+        switch(view.getId())
         {
-            // Handle onClick for check status button
-            case R.id.tv_main_checkStatus:
-                Toast.makeText(getApplicationContext(), "Going to check canteen status..", Toast.LENGTH_SHORT).show();
-
-                // Launch main activity
-                startActivity(new Intent(this, PickerActivity.class));
+            case R.id.radio_btn_Canteen_A:
+                Toast.makeText(getApplicationContext(), "Canteen A", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.radio_btn_Canteen_B:
+                Toast.makeText(getApplicationContext(), "Canteen B", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.radio_btn_Canteen_C:
+                Toast.makeText(getApplicationContext(), "Canteen C", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
