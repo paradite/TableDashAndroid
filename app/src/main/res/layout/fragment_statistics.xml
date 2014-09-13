@@ -78,7 +78,7 @@
 
         android:text="@string/avg_waiting_time"
         android:textColor="#0000CC"
-        android:textSize="24sp"
+        android:textSize="28sp"
         android:textStyle="bold" />
 
     <TextView
@@ -93,7 +93,7 @@
 
         android:text="@string/temp_value_zero"
         android:textColor="#0000CC"
-        android:textSize="24sp"
+        android:textSize="28sp"
         android:textStyle="bold" />
 
 </RelativeLayout>

@@ -14,7 +14,7 @@ public class Table {
     public static Bitmap bitmap = null;
 
     private String id;
-    private int durationLeft;
+    private int durationLeft; // Should be in seconds
     private Paint paint;
     private Rect rect;
 
