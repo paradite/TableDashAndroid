@@ -47,8 +47,8 @@ public class BaseActivity extends Activity {
         setContentView(R.layout.activity_base);
     }
 
-    protected void handleIntent(Intent intent) {
-
+    protected String handleIntent(Intent intent) {
+        String serialId = null;
         String action = intent.getAction();
 //        Log.e(TAG, "in handleIntent, action: " + action);
         if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)) {
@@ -61,7 +61,6 @@ public class BaseActivity extends Activity {
             String tech_Ndef = Ndef.class.getName();
             Log.d(TAG, "tags: " + tag);
             // Get the ID directly
-            String serialId = null;
             try {
                 byte[] tagId = tag.getId();
                 serialId = Helper.getHexString(tagId, tagId.length);
@@ -71,6 +70,7 @@ public class BaseActivity extends Activity {
                 serialId = "ERROR";
             }
         }
+        return serialId;
     }
 
     /**
