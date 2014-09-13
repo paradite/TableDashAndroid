@@ -3,6 +3,10 @@ package thack.ac.tabledash;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.Shader;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -10,9 +14,17 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
 
     private GraphicsThread _thread;
 
+    private Paint paint;
+    private Rect rect;
+
+    private Paint paintBlack;
+
     public GraphicalLayout(Context context) {
         super(context);
         getHolder().addCallback(this);
+
+        paintBlack = new Paint(Color.BLACK);
+        paintBlack.setTextSize(50);
     }
 
     @Override
@@ -28,6 +40,18 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
                 table.setDurationLeft(table.getDurationLeft() - 1);
             }
         }
+
+        if(rect == null)
+        {
+            rect = new Rect(60, canvas.getHeight() - 200, canvas.getWidth() - 60, canvas.getHeight() - 60);
+            Shader shader = new LinearGradient(rect.left, 0, rect.right, 0, Color.RED, Color.GREEN, Shader.TileMode.CLAMP);
+            paint = new Paint();
+            paint.setShader(shader);
+        }
+        canvas.drawRect(rect, paint);
+
+        canvas.drawText("Occupied", 40, canvas.getHeight() - 240, paintBlack);
+        canvas.drawText("Vacant", canvas.getWidth() - 200, canvas.getHeight() - 240, paintBlack);
     }
 
     @Override
