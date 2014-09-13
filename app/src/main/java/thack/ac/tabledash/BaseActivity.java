@@ -1,6 +1,7 @@
 package thack.ac.tabledash;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -185,6 +186,9 @@ public class BaseActivity extends Activity {
 //                        Update the variables
                         updateEndingTime(minutes);
                         updateTagID(tag_ID);
+//                        Set up scheduled notification
+                        createScheduledNotification(minutes);
+
                         Log.e(TAG, "Time: " + ending_time + " current TAG ID:" + current_table_ID + "after new check in");
                         new checkInAsync().execute(nameValuePairs);
                     }
@@ -344,6 +348,31 @@ public class BaseActivity extends Activity {
         }
     }
 
+    private void createScheduledNotification(int minutes)
+    {
+//        Schedule a notification at 80% time
+        int scheduled_seconds = (int)(minutes * 60 * 0.8);
+        // Get new calendar object and set the date to now
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        // Add defined amount of minutes to the date
+        calendar.add(Calendar.SECOND, scheduled_seconds);
+
+        // Retrieve alarm manager from the system
+        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(getBaseContext().ALARM_SERVICE);
+        // Every scheduled intent needs a different ID, else it is just executed once
+        int id = (int) System.currentTimeMillis();
+
+        // Prepare the intent which should be launched at the date
+        Intent intent = new Intent(this, TimeAlarm.class);
+
+        // Prepare the pending intent
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Register the alert in the system. You have the option to define if the device has to wake up on the alert or not
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+    }
+
     private void updateEndingTime(int minutes) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MINUTE, minutes);
@@ -416,6 +445,54 @@ public class BaseActivity extends Activity {
     protected void onResume() {
         super.onResume();
         setupForegroundDispatch(this, mNfcAdapter);
+        Log.e(TAG, "");
+        if(isEating() && almostEnd() && current_table_ID!= null && !current_table_ID.equals("")){
+            AlertDialog.Builder alert = new AlertDialog.Builder(self);
+
+            LayoutInflater inflater;
+            inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+//            Use different durations for new check in at new places and renewed check in
+            LinearLayout ll;
+            String buttonConfirmText;
+            String buttonCancelText;
+            buttonConfirmText = "Extend";
+            buttonCancelText = "No need";
+            alert.setTitle(getResources().getString(R.string.dialog_title_re_check_in));
+            ll = (LinearLayout) inflater.inflate(R.layout.re_check_in_dialog ,null);
+            alert.setView(ll);
+            alert.setMessage(R.string.dialog_message_re_check_in);
+
+            final RadioGroup rg1=(RadioGroup)ll.findViewById(R.id.durations_rg);
+
+            alert.setPositiveButton(buttonConfirmText, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    if(rg1.getCheckedRadioButtonId()!=-1){
+                        String selection = getSelectionFromRadioGroup(rg1);
+                        int minutes = Integer.parseInt(selection);
+                        //Add nameValuePair for http request
+                        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                        addToNameValuePairs(selection, nameValuePairs, current_table_ID);
+//                        Update the variables
+                        updateEndingTime(minutes);
+                        updateTagID(current_table_ID);
+//                        Set up scheduled notification
+                        createScheduledNotification(minutes);
+
+                        Log.e(TAG, "Time: " + ending_time + " current TAG ID:" + current_table_ID + "after new check in");
+                        new checkInAsync().execute(nameValuePairs);
+                    }
+                }
+            });
+
+            alert.setNegativeButton(buttonCancelText, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    // Canceled.
+                }
+            });
+
+            alert.show();
+        }
     }
 
     @Override

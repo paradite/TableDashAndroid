@@ -28,7 +28,7 @@ public class TimeAlarm extends BroadcastReceiver {
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Notification.Builder mBuilder =
                 new Notification.Builder(context)
-                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setSmallIcon(R.drawable.ic_table_logo)
                         .setContentTitle(messageTitle)
                         .setStyle(new Notification.BigTextStyle()
                                 .bigText(msg))
