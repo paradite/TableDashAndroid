@@ -2,19 +2,29 @@ package thack.ac.tabledash;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import org.apache.http.NameValuePair;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class PickerActivity extends BaseActivity implements OnClickListener {
+
+    String canteenID;
+    RadioGroup rg1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picker);
-
+        rg1=(RadioGroup)findViewById(R.id.radioGroup_Location);
         // Implement onClickListeners for clickable views
         findViewById(R.id.radio_btn_Canteen_A).setOnClickListener(this);
         findViewById(R.id.radio_btn_Canteen_B).setOnClickListener(this);
@@ -56,7 +66,14 @@ public class PickerActivity extends BaseActivity implements OnClickListener {
                 Toast.makeText(getApplicationContext(), "Canteen C", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_picker_check_status:
-                new checkVacancyAsync().execute();
+                if(rg1.getCheckedRadioButtonId()!=-1){
+                    String selection = getSelectionFromRadioGroup(rg1);
+                    //Add nameValuePair for http request
+                    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                    addToNameValuePairsCheck(nameValuePairs, selection);
+                    new checkVacancyAsync().execute(nameValuePairs);
+                }
+
         }
     }
 }

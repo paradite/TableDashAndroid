@@ -346,13 +346,25 @@ public class BaseActivity extends Activity {
         nameValuePairs.add(new BasicNameValuePair(param_name, param_value));
     }
 
-    private String getSelectionFromRadioGroup(RadioGroup rg1) {
+    /**
+     * NameValuePair for Check out
+     * @param nameValuePairs    NameValuePair
+     */
+    public void addToNameValuePairsCheck(List<NameValuePair> nameValuePairs, String canteen) {
+        String param_name;
+        String param_value;
+        param_name= "canteen_id";
+        param_value= canteen;
+        nameValuePairs.add(new BasicNameValuePair(param_name, param_value));
+    }
+
+    public String getSelectionFromRadioGroup(RadioGroup rg1) {
         int id= rg1.getCheckedRadioButtonId();
         View radioButton = rg1.findViewById(id);
         int radioId = rg1.indexOfChild(radioButton);
         RadioButton btn = (RadioButton) rg1.getChildAt(radioId);
         String selection = (String) btn.getText();
-        Toast.makeText(self, "You selected " + selection + " minutes.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(self, "You selected " + selection, Toast.LENGTH_SHORT).show();
         return selection;
     }
 
