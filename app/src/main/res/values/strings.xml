@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Overall Strings -->
     <string name="app_name">Table Dash</string>
     <string name="hello_world">Hello world!</string>
+    <string name="update">Update</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_base">BaseActivity</string>
 

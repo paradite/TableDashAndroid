@@ -16,7 +16,7 @@ public class Table {
     private Paint paint;
     private Rect rect;
 
-    public Table(Context context, int durationLeft, int left, int top) {
+    public Table(Context context, int durationLeft, int locationX, int locationY) {
         if(bitmap == null)
         {
             bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.table);
@@ -26,7 +26,9 @@ public class Table {
         this.paint = new Paint();
         updatePaint();
 
-        rect = new Rect(left, top, left + bitmap.getWidth(), top + bitmap.getHeight());
+        rect = new Rect(locationX, locationY,
+                locationX + bitmap.getWidth(),
+                locationY + bitmap.getHeight());
     }
 
     public int getDurationLeft() {
@@ -34,7 +36,7 @@ public class Table {
     }
 
     public void setDurationLeft(int durationLeft) {
-        this.durationLeft = durationLeft;
+        this.durationLeft = (durationLeft <= 0) ? 0 : durationLeft;
     }
 
     public void updatePaint()
@@ -43,16 +45,11 @@ public class Table {
             ColorFilter filter = new LightingColorFilter(Color.RED, 1);
             paint.setColorFilter(filter);
         }
-        else if(durationLeft <= 0) {
-            ColorFilter filter = new LightingColorFilter(Color.WHITE, 1);
-            paint.setColorFilter(filter);
-        }
-        else if(durationLeft <= 5) {
-            ColorFilter filter = new LightingColorFilter(Color.GREEN, 1);
-            paint.setColorFilter(filter);
-        }
-        else if(durationLeft <= 15) {
-            ColorFilter filter = new LightingColorFilter(Color.YELLOW, 1);
+        else {
+            int redValue = (int)((double)durationLeft/30) * 255;
+            int greenValue = (int)((double)(30 - durationLeft)/30) * 255;
+
+            ColorFilter filter = new LightingColorFilter(Color.rgb(redValue, greenValue, 0), 1);
             paint.setColorFilter(filter);
         }
     }

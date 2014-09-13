@@ -13,17 +13,9 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
 
     private GraphicsThread _thread;
 
-    public static ArrayList<Table> tables;
-
     public GraphicalLayout(Context context) {
         super(context);
         getHolder().addCallback(this);
-
-        tables = new ArrayList<Table>();
-        tables.add(new Table(context, 30, 0, 0));
-        tables.add(new Table(context, 15, tables.get(0).getRect().width() + 40, 0));
-        tables.add(new Table(context, 5, 0, tables.get(0).getRect().height() + 40));
-        tables.add(new Table(context, 0, tables.get(0).getRect().width() + 40, tables.get(0).getRect().height() + 40));
     }
 
     @Override
@@ -31,7 +23,8 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
         // Clears the canvas
         canvas.drawColor(Color.BLACK);
 
-        for(Table table : tables) {
+        // Redraw the tables
+        for(Table table : StatusActivity.tables) {
             canvas.drawBitmap(Table.bitmap, table.getRect().left, table.getRect().top, table.getPaint());
         }
     }
