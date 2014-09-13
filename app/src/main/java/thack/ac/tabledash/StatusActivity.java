@@ -76,10 +76,10 @@ public class StatusActivity extends BaseActivity {
 
         // new Table(context, String id, int durationLeft, int locationX, int locationY)
         if(tables.isEmpty()){
-            tables.add(new Table(this, "Guest 0", 30, 80, 80));
-            tables.add(new Table(this, "Guest 1", 30, 600, 80));
-            tables.add(new Table(this, "Guest 2", 30, 80, 600));
-            tables.add(new Table(this, "Guest 3", 30, 600, 600));
+            tables.add(new Table(this, "Table 0", 30, 80, 80));
+            tables.add(new Table(this, "Table 1", 30, 600, 80));
+            tables.add(new Table(this, "Table 2", 30, 80, 600));
+            tables.add(new Table(this, "Table 3", 30, 600, 600));
         }
     }
 

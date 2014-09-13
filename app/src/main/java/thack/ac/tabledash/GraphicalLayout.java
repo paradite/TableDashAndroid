@@ -25,6 +25,7 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
 
         paintBlack = new Paint(Color.BLACK);
         paintBlack.setTextSize(50);
+        paintBlack.setFakeBoldText(true);
     }
 
     @Override
@@ -37,6 +38,9 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
             // Update the duration left for each table
             for (Table table : StatusActivity.tables) {
                 canvas.drawBitmap(Table.bitmap, table.getRect().left, table.getRect().top, table.getPaint());
+                canvas.drawText(table.getID(), (table.getRect().left + table.getRect().width() / 2 - paintBlack.measureText(table.getID()) / 2),
+                        (table.getRect().top + table.getRect().height() / 2), paintBlack);
+
                 table.setDurationLeft(table.getDurationLeft() - 1);
             }
         }
@@ -50,8 +54,8 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
         }
         canvas.drawRect(rect, paint);
 
-        canvas.drawText("Occupied", 40, canvas.getHeight() - 240, paintBlack);
-        canvas.drawText("Vacant", canvas.getWidth() - 200, canvas.getHeight() - 240, paintBlack);
+        canvas.drawText("Occupied", 40, canvas.getHeight() - 230, paintBlack);
+        canvas.drawText("Vacant", canvas.getWidth() - 200, canvas.getHeight() - 230, paintBlack);
     }
 
     @Override

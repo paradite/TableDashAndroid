@@ -35,6 +35,16 @@ public class Table {
                 locationY + bitmap.getHeight());
     }
 
+    public String getID()
+    {
+        return id;
+    }
+
+    public void setID(String id)
+    {
+        this.id = id;
+    }
+
     public int getDurationLeft() {
         return durationLeft;
     }
