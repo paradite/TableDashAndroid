@@ -8,20 +8,9 @@
   </component>
   <component name="masterDetails">
     <states>
-      <state key="Copyright.UI">
-        <settings>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
       <state key="ProjectJDKs.UI">
         <settings>
-          <last-edited>Android API 20, L preview Platform</last-edited>
+          <last-edited>Android API 20 Platform</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
