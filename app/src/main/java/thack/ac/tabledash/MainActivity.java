@@ -41,23 +41,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             mStatusView.setText("NFC is disabled. Please enable it in the settings to check in.");
         }
 
-//        Check if user is still eating
-//        Open pref storage
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-//        Check the pref storage ending time to see if still eating
-        if(preferences.contains(TAG_ENDING_TIME)){
-            String date_string = preferences.getString(TAG_ENDING_TIME, null);
-            String notification_string = preferences.getString(TAG_NOTIFICATION_TIME, null);
-            if(date_string!=null){
-                ending_time = Helper.parseDateFromString(date_string);
-                notification_time = Helper.parseDateFromString(notification_string);
-                Boolean eat_finished = Helper.checkIfFinished(ending_time);
-                if(!eat_finished){
+
+        if(isEating()){
 //                    Still eating, make the check out button visible and record the tag ID
-                    checkOutButton.setVisibility(View.VISIBLE);
-                    current_table_ID = preferences.getString(TAG_TABLE_ID, null);
-                }
-            }
+            checkOutButton.setVisibility(View.VISIBLE);
         }
 
         Log.e(TAG, "Time: " + ending_time + " current TAG ID:" + current_table_ID);

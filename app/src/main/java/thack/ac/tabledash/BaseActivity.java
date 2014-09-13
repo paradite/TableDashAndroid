@@ -24,6 +24,7 @@ import android.nfc.tech.NfcB;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -117,6 +118,42 @@ public class BaseActivity extends Activity {
             return;
         }
         setContentView(R.layout.activity_base);
+//        Check if user is still eating
+//        Open pref storage
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        Check the pref storage ending time to see if still eating
+        if(preferences.contains(TAG_ENDING_TIME)){
+            String date_string = preferences.getString(TAG_ENDING_TIME, null);
+            String notification_string = preferences.getString(TAG_NOTIFICATION_TIME, null);
+            if(date_string!=null){
+                ending_time = Helper.parseDateFromString(date_string);
+                notification_time = Helper.parseDateFromString(notification_string);
+                current_table_ID = preferences.getString(TAG_TABLE_ID, null);
+                Log.e(TAG, "end: " + ending_time.getTime() + "noti: " + notification_time.getTime() + "eating? " + isEating());
+                Log.e(TAG, "now: " + Calendar.getInstance().getTime().getTime());
+
+            }
+        }
+        if(isEating()){
+            //        Log out user after time passed in case the activity does not gets closed
+            final int delay = (int)(ending_time.getTime() - Calendar.getInstance().getTime().getTime());
+            final int notification_delay = (int)(notification_time.getTime() - Calendar.getInstance().getTime().getTime());
+            Log.e(TAG, "delay: " + delay + "noti delay: " + notification_delay);
+            r = new Runnable() {
+                public void run() {
+                    Log.e(TAG, "Runnable 1!");
+                    checkOut(false);
+                }
+            };
+            r2 = new Runnable() {
+                public void run() {
+                    Log.e(TAG, "Runnable 2!");
+                    notifyEndingSoon();
+                }
+            };
+            handler.postDelayed(r, delay);
+            handler.postDelayed(r2, notification_delay);
+        }
     }
 
     protected String handleIntent(Intent intent) {
@@ -211,19 +248,19 @@ public class BaseActivity extends Activity {
                         notifyEating();
 //                        Set up scheduled notification
                         createScheduledNotification(minutes);
-//                        Remove previous handlers
-                        handler.removeCallbacks(r);
 //                        Log out user after time passed in case the activity does not gets closed
                         final int delay = 1000 * total_seconds;
                         final int notification_delay = 1000 * notification_seconds;
+                        Log.e(TAG, "delay: " + delay + "noti delay: " + notification_delay);
                         r = new Runnable() {
                             public void run() {
+                                Log.e(TAG, "Runnable 22!");
                                 checkOut(false);
                             }
                         };
                         r2 = new Runnable() {
                             public void run() {
-                                Log.e(TAG, "Runnable!");
+                                Log.e(TAG, "Runnable 11!");
                                 notifyEndingSoon();
                             }
                         };
@@ -576,28 +613,6 @@ public class BaseActivity extends Activity {
             notifyCheckedOut(self);
         }
 
-//        Remove previous handlers
-        handler.removeCallbacks(r);
-
-        if(isEating()){
-            //        Log out user after time passed in case the activity does not gets closed
-            final int delay = 1000 * (int)(ending_time.getTime() - Calendar.getInstance().getTime().getTime());
-            final int notification_delay = 1000 * (int)(notification_time.getTime() - Calendar.getInstance().getTime().getTime());
-            r = new Runnable() {
-                public void run() {
-                    checkOut(false);
-                }
-            };
-            r2 = new Runnable() {
-                public void run() {
-                    Log.e(TAG, "Runnable!");
-                    notifyEndingSoon();
-                }
-            };
-            handler.postDelayed(r, delay);
-            handler.postDelayed(r2, notification_delay);
-        }
-
     }
 
     private void notifyCheckedOut(Activity activity) {
@@ -617,8 +632,15 @@ public class BaseActivity extends Activity {
     protected void onPause() {
         stopForegroundDispatch(this, mNfcAdapter);
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 //        Remove previous handlers
+        Log.e(TAG, "onDestroy");
         handler.removeCallbacks(r);
+        handler.removeCallbacks(r2);
     }
 
     @Override
