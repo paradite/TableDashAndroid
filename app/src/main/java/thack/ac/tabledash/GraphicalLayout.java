@@ -3,11 +3,8 @@ package thack.ac.tabledash;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import java.util.ArrayList;
 
 public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -21,11 +18,15 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
     @Override
     public void onDraw(Canvas canvas) {
         // Clears the canvas
-        canvas.drawColor(Color.BLACK);
+        canvas.drawColor(Color.WHITE);
 
-        // Redraw the tables
-        for(Table table : StatusActivity.tables) {
-            canvas.drawBitmap(Table.bitmap, table.getRect().left, table.getRect().top, table.getPaint());
+        if(StatusActivity.tables != null) {
+            // Redraw the tables every second
+            // Update the duration left for each table
+            for (Table table : StatusActivity.tables) {
+                canvas.drawBitmap(Table.bitmap, table.getRect().left, table.getRect().top, table.getPaint());
+                table.setDurationLeft(table.getDurationLeft() - 1);
+            }
         }
     }
 
@@ -73,12 +74,18 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
                 c = null;      //set to false and loop ends, stopping thread
 
                 try {
+                    // Limit to one frame per second
+                    Thread.sleep(1000);
+
                     c = _surfaceHolder.lockCanvas(null);
                     synchronized (_surfaceHolder) {
 
                     //Insert methods to modify positions of items in onDraw()
                     postInvalidate();
                     }
+                }
+                catch (InterruptedException e1) {
+                    e1.printStackTrace();
                 }
                 finally {
                     if (c != null) {

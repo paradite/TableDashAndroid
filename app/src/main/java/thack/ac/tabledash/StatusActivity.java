@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class StatusActivity extends BaseActivity {
 
-    public static ArrayList<Table> tables;
+    public static ArrayList<Table> tables = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +46,11 @@ public class StatusActivity extends BaseActivity {
 
         actionBar.addTab(tab);
 
-        tables.add(new Table(this, 30, 0, 0));
-        tables.add(new Table(this, 15, 300, 0));
-        tables.add(new Table(this, 0, 0, 300));
+        // new Table(context, String id, int durationLeft, int locationX, int locationY)
+        tables.add(new Table(this, "Guest 0", 30, 40, 40));
+        tables.add(new Table(this, "Guest 1", 30, 520, 40));
+        tables.add(new Table(this, "Guest 2", 30, 40, 520));
+        tables.add(new Table(this, "Guest 3", 30, 520, 520));
     }
 
     @Override
@@ -68,7 +70,7 @@ public class StatusActivity extends BaseActivity {
                 // Update statistics & graphical layout fragments
                 for(Table table : tables)
                 {
-                    table.setDurationLeft(table.getDurationLeft() - 1);
+                    //table.setDurationLeft(table.getDurationLeft() - 1);
                 }
                 break;
         }
@@ -104,28 +106,12 @@ public class StatusActivity extends BaseActivity {
                 // If it exists, simply attach it in order to show it
                 ft.attach(mFragment);
             }
-
-            if(tab.getTag().equals("graphical"))
-            {
-                // If tab selected is the graphical layout tab
-                // Do something
-
-
-            }
         }
 
         public void onTabUnselected(Tab tab, FragmentTransaction ft) {
             if (mFragment != null) {
                 // Detach the fragment, because another one is being attached
                 ft.detach(mFragment);
-            }
-
-            if(tab.getTag().equals("graphical"))
-            {
-                // If tab unselected is the graphical layout tab
-                // Do something, empty table?
-
-
             }
         }
 

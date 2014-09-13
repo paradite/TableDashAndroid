@@ -12,17 +12,21 @@ import android.graphics.Rect;
 public class Table {
 
     public static Bitmap bitmap = null;
+
+    private String id;
     private int durationLeft;
     private Paint paint;
     private Rect rect;
 
-    public Table(Context context, int durationLeft, int locationX, int locationY) {
+    public Table(Context context, String id, int durationLeft, int locationX, int locationY) {
         if(bitmap == null)
         {
             bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.table);
         }
 
+        this.id = id;
         this.durationLeft = durationLeft;
+
         this.paint = new Paint();
         updatePaint();
 
@@ -37,17 +41,18 @@ public class Table {
 
     public void setDurationLeft(int durationLeft) {
         this.durationLeft = (durationLeft <= 0) ? 0 : durationLeft;
+        updatePaint();
     }
 
     public void updatePaint()
     {
-        if(durationLeft >= 30) {
+        if(durationLeft > 30) {
             ColorFilter filter = new LightingColorFilter(Color.RED, 1);
             paint.setColorFilter(filter);
         }
         else {
-            int redValue = (int)((double)durationLeft/30) * 255;
-            int greenValue = (int)((double)(30 - durationLeft)/30) * 255;
+            int redValue = (int)((durationLeft/30.0) * 255);
+            int greenValue = (int)( ((30 - durationLeft)/30.0) * 255);
 
             ColorFilter filter = new LightingColorFilter(Color.rgb(redValue, greenValue, 0), 1);
             paint.setColorFilter(filter);
