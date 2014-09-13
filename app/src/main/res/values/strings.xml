@@ -24,8 +24,10 @@
     <string name="status_tab_graphical">Graphical Layout</string>
 
     <!-- Statistics Fragment Strings -->
-    <string name="loading_statistics">Loading statistics..</string>
-    <string name="still_loading">Still loading..</string>
+    <string name="total_tables">Total tables: </string>
+    <string name="temp_value_zero">0</string>
+    <string name="vacant_tables">Vacant tables:</string>
+    <string name="avg_waiting_time">Average waiting time:</string>
 
     <!-- Graphical Fragment Strings -->
     <string name="work_in_progress">Work in progress!</string>

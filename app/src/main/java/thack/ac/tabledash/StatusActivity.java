@@ -47,10 +47,10 @@ public class StatusActivity extends BaseActivity {
         actionBar.addTab(tab);
 
         // new Table(context, String id, int durationLeft, int locationX, int locationY)
-        tables.add(new Table(this, "Guest 0", 30, 40, 40));
-        tables.add(new Table(this, "Guest 1", 30, 520, 40));
-        tables.add(new Table(this, "Guest 2", 30, 40, 520));
-        tables.add(new Table(this, "Guest 3", 30, 520, 520));
+        tables.add(new Table(this, "Guest 0", 30, 80, 80));
+        tables.add(new Table(this, "Guest 1", 30, 600, 80));
+        tables.add(new Table(this, "Guest 2", 30, 80, 600));
+        tables.add(new Table(this, "Guest 3", 30, 600, 600));
     }
 
     @Override
@@ -70,7 +70,6 @@ public class StatusActivity extends BaseActivity {
                 // Update statistics & graphical layout fragments
                 for(Table table : tables)
                 {
-                    //table.setDurationLeft(table.getDurationLeft() - 1);
                 }
                 break;
         }
