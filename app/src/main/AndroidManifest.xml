@@ -37,6 +37,13 @@
         </activity>
 
         <activity
+            android:name=".StatusActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".PickerActivity">
+        </activity>
+
+        <activity
             android:name=".BaseActivity"
             android:label="@string/title_activity_base" >
         </activity>
