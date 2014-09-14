@@ -120,7 +120,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         {
             // Handle onClick for check status button
             case R.id.tv_main_checkStatus:
-                Toast.makeText(getApplicationContext(), "Going to check canteen status..", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Going to check canteen status..", Toast.LENGTH_SHORT).show();
 
                 // Launch main activity
                 startActivity(new Intent(this, PickerActivity.class));

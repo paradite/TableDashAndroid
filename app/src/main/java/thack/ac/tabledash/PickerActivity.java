@@ -58,13 +58,13 @@ public class PickerActivity extends BaseActivity implements OnClickListener {
         switch(view.getId())
         {
             case R.id.radio_btn_Canteen_A:
-                Toast.makeText(getApplicationContext(), "Canteen A", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Canteen A", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.radio_btn_Canteen_B:
-                Toast.makeText(getApplicationContext(), "Canteen B", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Canteen B", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.radio_btn_Canteen_C:
-                Toast.makeText(getApplicationContext(), "Canteen C", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Canteen C", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_picker_check_status:
                 if(rg1.getCheckedRadioButtonId()!=-1){

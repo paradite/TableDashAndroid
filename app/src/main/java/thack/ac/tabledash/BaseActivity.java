@@ -208,7 +208,7 @@ public class BaseActivity extends Activity {
         if(tag_ID != null){
             Log.e(TAG, "Time: " + ending_time + " current TAG ID:" + current_table_ID);
 
-            Toast.makeText(this, "Tag ID: " + tag_ID, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "Tag ID: " + tag_ID, Toast.LENGTH_SHORT).show();
             AlertDialog.Builder alert = new AlertDialog.Builder(self);
 
             LayoutInflater inflater;
@@ -376,7 +376,7 @@ public class BaseActivity extends Activity {
         int radioId = rg1.indexOfChild(radioButton);
         RadioButton btn = (RadioButton) rg1.getChildAt(radioId);
         String selection = (String) btn.getText();
-        Toast.makeText(self, "You selected " + selection, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(self, "You selected " + selection, Toast.LENGTH_SHORT).show();
         return selection;
     }
 
