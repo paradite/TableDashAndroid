@@ -36,6 +36,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         tapAnimation = (AnimationDrawable) scanImage.getBackground();
         tapAnimation.start();
 
+        if(isEating()){
+            notifyEating();
+        }
+
         //Set the default texts
         if (!mNfcAdapter.isEnabled()) {
             mStatusView.setText("NFC is disabled. Please enable it to check in.");
@@ -138,9 +142,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
          */
         registerReceiver(receiver, filter);
         setupForegroundDispatch(this, mNfcAdapter);
-        if(isEating()){
-            notifyEating();
-        }
         if(isEating() && almostEnd() && current_table_ID!= null && !current_table_ID.equals("")){
             notifyEndingSoon();
         }

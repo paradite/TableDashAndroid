@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.LinearGradient;
 import android.graphics.drawable.AnimationDrawable;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
@@ -474,7 +475,7 @@ public class BaseActivity extends Activity {
             // Creating service handler class instance
             sh = new ServiceHandler();
             json = sh.makeServiceCall(PREFIX_URL + CHECK_VAC_URL, ServiceHandler.POST, nameValuePairs);
-            Log.e(TAG, "Response: " + json);
+            Log.e(TAG, "JSON -2 : " + json);
 
 
             return json;
@@ -486,7 +487,9 @@ public class BaseActivity extends Activity {
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
+            Log.e(TAG, "JSON -1 : " + json);
             Intent newintent = new Intent(self, StatusActivity.class);
+            newintent.putExtra("json", json);
             startActivity(newintent);
         }
     }
@@ -677,7 +680,7 @@ public class BaseActivity extends Activity {
         // Handle action bar item clicks here.
         switch(item.getItemId())
         {
-            case R.id.action_update:
+            case R.id.action_donate:
                 onBraintreeSubmit(this);
                 return true;
         }
