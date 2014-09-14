@@ -248,7 +248,7 @@ public class StatusActivity extends BaseActivity {
                         total_duration += duration;
                         tables.add(new Table(this, table_ID, duration, x[i], y[i]));
                     }
-                    tv_avgWaitingTime.setText(String.valueOf(total_duration / 4));
+//                    tv_avgWaitingTime.setText(String.valueOf(total_duration / 4));
                 }
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
@@ -342,7 +342,7 @@ public class StatusActivity extends BaseActivity {
                             total_duration += duration;
                             tables.add(new Table(self, table_ID, duration, x[i], y[i]));
                         }
-                        tv_avgWaitingTime.setText(String.valueOf((total_duration/4)));
+//                        tv_avgWaitingTime.setText(String.valueOf((total_duration/4)));
                     }
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
