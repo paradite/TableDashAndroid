@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -22,10 +23,20 @@ import java.util.ArrayList;
 public class StatusActivity extends BaseActivity {
     public static ArrayList<Table> tables = null;
     StatusActivity self = this;
+
+    // Needed to populate statistics page
+    private TextView tv_totalTables_value;
+    private TextView tv_vacantTables_value;
+    private TextView tv_avgWaitingTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        tv_totalTables_value = (TextView) findViewById(R.id.tv_totalTables_value);
+        tv_vacantTables_value = (TextView) findViewById(R.id.tv_vacantTables_value);
+        tv_avgWaitingTime = (TextView) findViewById(R.id.tv_averageWaitingTime_value);
 
         //Format the JSON for tables
         //Wrapper JSONArray
