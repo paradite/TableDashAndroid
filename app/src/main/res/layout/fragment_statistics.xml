@@ -9,7 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     
-    android:background="#33CCFF"
+    android:background="#7CA8B2"
     
     tools:context=".StatusActivity$StatisticsFragment" >
 
@@ -21,7 +21,7 @@
         android:layout_marginTop="40dp"
         
         android:text="@string/total_tables"
-        android:textColor="#0000CC"
+        android:textColor="#110011"
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -36,7 +36,7 @@
         android:layout_toEndOf="@id/tv_totalTables"
 
         android:text="@string/temp_value_zero"
-        android:textColor="#0000CC"
+        android:textColor="#110011"
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -49,7 +49,7 @@
         android:layout_marginTop="20dp"
 
         android:text="@string/vacant_tables"
-        android:textColor="#0000CC"
+        android:textColor="#110011"
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -64,7 +64,7 @@
         android:layout_toEndOf="@id/tv_vacantTables"
 
         android:text="@string/temp_value_zero"
-        android:textColor="#0000CC"
+        android:textColor="#110011"
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -77,7 +77,7 @@
         android:layout_marginTop="20dp"
 
         android:text="@string/avg_waiting_time"
-        android:textColor="#0000CC"
+        android:textColor="#110011"
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -92,8 +92,18 @@
         android:layout_toEndOf="@id/tv_averageWaitingTime"
 
         android:text="@string/temp_value_zero"
-        android:textColor="#0000CC"
+        android:textColor="#110011"
         android:textSize="28sp"
         android:textStyle="bold" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:background="@drawable/pic_time_is_money"
+
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp" />
 
 </RelativeLayout>

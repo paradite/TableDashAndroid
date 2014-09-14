@@ -38,7 +38,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
         //Set the default texts
         if (!mNfcAdapter.isEnabled()) {
-            mStatusView.setText("NFC is disabled. Please enable it in the settings to check in.");
+            mStatusView.setText("NFC is disabled. Please enable it to check in.");
         }
 
 
