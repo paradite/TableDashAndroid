@@ -6,6 +6,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="update">Update</string>
     <string name="action_settings">Settings</string>
+    <string name="action_donate">Donate</string>
     <string name="title_activity_base">BaseActivity</string>
 
     <!-- Main Activity Strings -->
@@ -14,9 +15,9 @@
 
     <!-- Picker Activity Strings -->
     <string name="pick_location">Pick a location:</string>
-    <string name="location_canteen_a">Canteen A</string>
-    <string name="location_canteen_b">Canteen B</string>
-    <string name="location_canteen_c">Canteen C</string>
+    <string name="location_canteen_a">Canteen 1</string>
+    <string name="location_canteen_b">Canteen 2</string>
+    <string name="location_canteen_c">Canteen 3</string>
     <string name="picker_check_status">Check status</string>
 
     <!-- Status Activity Strings -->

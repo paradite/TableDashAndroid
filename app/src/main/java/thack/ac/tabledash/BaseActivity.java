@@ -38,6 +38,13 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.braintreepayments.api.Braintree;
+import com.braintreepayments.api.dropin.BraintreePaymentActivity;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
@@ -67,6 +74,9 @@ public class BaseActivity extends Activity {
 
 //    Android ID
     private String android_id;
+    String clientToken2 = "eyJ2ZXJzaW9uIjoxLCJhdXRob3JpemF0aW9uRmluZ2VycHJpbnQiOiI2ZjBjMGQ4YmU1NjBlNjhiMjAwYjI4MGMxZTBjNDU0NTk0ZGU4ZjQ3MWVhOTBjZjczNTRmMzc3NmU0ZDFhYjY0fGNyZWF0ZWRfYXQ9MjAxNC0wOS0xNFQwMDoyMzoyMi45MDQ3NTE5NTArMDAwMFx1MDAyNm1lcmNoYW50X2lkPWRjcHNweTJicndkanIzcW5cdTAwMjZwdWJsaWNfa2V5PTl3d3J6cWszdnIzdDRuYzgiLCJjb25maWdVcmwiOiJodHRwczovL2FwaS5zYW5kYm94LmJyYWludHJlZWdhdGV3YXkuY29tOjQ0My9tZXJjaGFudHMvZGNwc3B5MmJyd2RqcjNxbi9jbGllbnRfYXBpL3YxL2NvbmZpZ3VyYXRpb24iLCJjaGFsbGVuZ2VzIjpbImN2diJdLCJwYXltZW50QXBwcyI6W10sImNsaWVudEFwaVVybCI6Imh0dHBzOi8vYXBpLnNhbmRib3guYnJhaW50cmVlZ2F0ZXdheS5jb206NDQzL21lcmNoYW50cy9kY3BzcHkyYnJ3ZGpyM3FuL2NsaWVudF9hcGkiLCJhc3NldHNVcmwiOiJodHRwczovL2Fzc2V0cy5icmFpbnRyZWVnYXRld2F5LmNvbSIsImF1dGhVcmwiOiJodHRwczovL2F1dGgudmVubW8uc2FuZGJveC5icmFpbnRyZWVnYXRld2F5LmNvbSIsImFuYWx5dGljcyI6eyJ1cmwiOiJodHRwczovL2NsaWVudC1hbmFseXRpY3Muc2FuZGJveC5icmFpbnRyZWVnYXRld2F5LmNvbSJ9LCJ0aHJlZURTZWN1cmVFbmFibGVkIjpmYWxzZSwicGF5cGFsRW5hYmxlZCI6dHJ1ZSwicGF5cGFsIjp7ImRpc3BsYXlOYW1lIjoiQWNtZSBXaWRnZXRzLCBMdGQuIChTYW5kYm94KSIsImNsaWVudElkIjpudWxsLCJwcml2YWN5VXJsIjoiaHR0cDovL2V4YW1wbGUuY29tL3BwIiwidXNlckFncmVlbWVudFVybCI6Imh0dHA6Ly9leGFtcGxlLmNvbS90b3MiLCJiYXNlVXJsIjoiaHR0cHM6Ly9hc3NldHMuYnJhaW50cmVlZ2F0ZXdheS5jb20iLCJhc3NldHNVcmwiOiJodHRwczovL2NoZWNrb3V0LnBheXBhbC5jb20iLCJkaXJlY3RCYXNlVXJsIjpudWxsLCJhbGxvd0h0dHAiOnRydWUsImVudmlyb25tZW50Tm9OZXR3b3JrIjp0cnVlLCJlbnZpcm9ubWVudCI6Im9mZmxpbmUiLCJtZXJjaGFudEFjY291bnRJZCI6IjV6dzVtbSIsImN1cnJlbmN5SXNvQ29kZSI6IlVTRCJ9fQ==";
+    String clientToken = "MIIBCgKCAQEAyrJIFzpFzGHClLRcnEkMJOOhD9ReWBxFp46AfUc+iIhvrayotkayf575H4Z76AZvvesKoAApIdk9mczVigCEMGaw275yFQ/L33BjygVpOZed02kSdpv4ADYygwXesO70V7p37zmzb7hzIaXi/CYLCv5Rnmg9G4c7pHH+jvDgLiyF5Qn7BAhbzI8DtZjuoa9CL6MbIaF3MNdzy3z7midBLli/Bs1xqSpQgKX5pYZtDJlI/fYe+utw8RwBf4jApy6a7a/wNe9dEIvlk0fQoOYvNtwfgjhAxnttv0ChByGyQBbiy6xwpveN553udcgzcL/o0rt4VCryvjD2cY2e5+HCLQIDAQAB";
+    int REQUEST_CODE = 100;
 
     /**
      * Urls for server communications
@@ -658,19 +668,44 @@ public class BaseActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.base, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        // Handle action bar item clicks here.
+        switch(item.getItemId())
+        {
+            case R.id.action_update:
+                onBraintreeSubmit(this);
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onBraintreeSubmit(Context context) {
+        Intent intent = new Intent(context, BraintreePaymentActivity.class);
+        intent.putExtra(BraintreePaymentActivity.EXTRA_CLIENT_TOKEN, clientToken2);
+        // REQUEST_CODE is arbitrary and is only used within this activity.
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE && resultCode == BraintreePaymentActivity.RESULT_OK) {
+            String paymentMethodNonce = data.getStringExtra(BraintreePaymentActivity.EXTRA_PAYMENT_METHOD_NONCE);
+            postNonceToServer(paymentMethodNonce);
+        }
+    }
+
+    void postNonceToServer(String nonce) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("nonce", nonce);
+        client.post(PREFIX_URL + "payment-method-nonce", params,
+                new AsyncHttpResponseHandler() {
+                    // Your implementation here
+                });
     }
 }

@@ -6,6 +6,7 @@ import android.app.ActionBar.Tab;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,26 +41,40 @@ public class StatusActivity extends BaseActivity {
 
         //Format the JSON for tables
         //Wrapper JSONArray
-        JSONArray wrapperJSON = null;
+        JSONArray tablewrapperJSON = null;
+        JSONArray outerwrapperJSON = null;
+        Log.e(TAG, "JSON 0: " + json);
         tables= new ArrayList<Table>();
         if (json != null) {
             try {
-                wrapperJSON = new JSONArray(json);
+                outerwrapperJSON = new JSONArray(json);
+                tablewrapperJSON = outerwrapperJSON.getJSONArray(0);
+                Log.e(TAG, "JSON 1: " + outerwrapperJSON.getJSONArray(1));
+                Log.e(TAG, "JSON 2: " + outerwrapperJSON.getJSONArray(1).getJSONArray(0));
+                Log.e(TAG, "JSON 3: " + outerwrapperJSON.getJSONArray(1).getJSONArray(0).getInt(0));
+                int occupy = outerwrapperJSON.getJSONArray(1).getJSONArray(0).getInt(0);
+                int total = outerwrapperJSON.getJSONArray(2).getJSONArray(0).getInt(0);
+                int vacant = total - occupy;
+                int total_duration = 0;
+                tv_totalTables_value.setText(total);
+                tv_vacantTables_value.setText(vacant);
                 int x[] = new int[]{80, 600, 80, 600};
                 int y[] = new int[]{80, 80, 600, 600};
 
                 //Add new experiments into database
                 int length = 0;
-                if (wrapperJSON.length() > 0) {
-                    length = wrapperJSON.length();
+                if (tablewrapperJSON.length() > 0) {
+                    length = tablewrapperJSON.length();
                     for (int i = 0; i < length; i++) {
-                        JSONArray table = wrapperJSON.getJSONArray(i);
+                        JSONArray table = tablewrapperJSON.getJSONArray(i);
                         String tag_ID = table.getString(0);
                         String table_ID = table.getString(1);
                         String ending_time = table.getString(2);
                         int duration = Integer.parseInt(ending_time);
+                        total_duration += duration;
                         tables.add(new Table(this, tag_ID, duration, x[i], y[i]));
                     }
+                    tv_avgWaitingTime.setText(total_duration/length);
                 }
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
@@ -116,6 +131,9 @@ public class StatusActivity extends BaseActivity {
                         self.recreate();
                     }
                 }, 2000);
+                break;
+            case R.id.action_donate:
+                onBraintreeSubmit(this);
                 break;
         }
         return super.onOptionsItemSelected(item);

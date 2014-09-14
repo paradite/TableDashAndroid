@@ -5,11 +5,11 @@
     <item android:id="@+id/action_update"
         android:icon="@drawable/ic_action_refresh"
         android:title="@string/update"
-        android:orderInCategory="200"
+        android:orderInCategory="20"
         android:showAsAction="always" />
 
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
+    <item android:id="@+id/action_donate"
+        android:title="@string/action_donate"
         android:orderInCategory="100"
-        android:showAsAction="never" />
+        android:showAsAction="ifRoom" />
 </menu>

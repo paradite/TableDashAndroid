@@ -46,7 +46,8 @@ public class PickerActivity extends BaseActivity implements OnClickListener {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_donate) {
+            onBraintreeSubmit(this);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -68,6 +69,8 @@ public class PickerActivity extends BaseActivity implements OnClickListener {
             case R.id.btn_picker_check_status:
                 if(rg1.getCheckedRadioButtonId()!=-1){
                     String selection = getSelectionFromRadioGroup(rg1);
+                    selection = selection.toLowerCase().replace(" ", "_");
+                    Log.e(TAG, "Table selected: " + selection);
                     //Add nameValuePair for http request
                     List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
                     addToNameValuePairsCheck(nameValuePairs, selection);
