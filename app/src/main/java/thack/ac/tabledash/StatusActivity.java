@@ -236,7 +236,7 @@ public class StatusActivity extends BaseActivity {
                             duration = Integer.parseInt(ending_time);
                         }else{
                             Date ending_date = Helper.parseDateFromString(ending_time);
-                            duration = (int)(ending_date.getTime() - Calendar.getInstance().getTime().getTime())/1000/1000;
+                            duration = (int) (ending_date.getTime() - Calendar.getInstance().getTime().getTime()) / 1000/1000/60;
                             if(duration < 0 ){
                                 duration = 0;
                             }
@@ -245,7 +245,7 @@ public class StatusActivity extends BaseActivity {
                         total_duration += duration;
                         tables.add(new Table(this, table_ID, duration, x[i], y[i]));
                     }
-                    tv_avgWaitingTime.setText(String.valueOf(total_duration / length));
+                    tv_avgWaitingTime.setText(String.valueOf(total_duration / 4));
                 }
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
@@ -330,7 +330,7 @@ public class StatusActivity extends BaseActivity {
                                 duration = Integer.parseInt(ending_time);
                             } else {
                                 Date ending_date = Helper.parseDateFromString(ending_time);
-                                duration = (int) (ending_date.getTime() - Calendar.getInstance().getTime().getTime()) / 1000 / 1000;
+                                duration = (int) (ending_date.getTime() - Calendar.getInstance().getTime().getTime()) / 1000/1000/60;
                                 if (duration < 0) {
                                     duration = 0;
                                 }
@@ -339,7 +339,7 @@ public class StatusActivity extends BaseActivity {
                             total_duration += duration;
                             tables.add(new Table(self, table_ID, duration, x[i], y[i]));
                         }
-                        tv_avgWaitingTime.setText(String.valueOf(total_duration / length));
+                        tv_avgWaitingTime.setText(String.valueOf((total_duration/4)));
                     }
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
