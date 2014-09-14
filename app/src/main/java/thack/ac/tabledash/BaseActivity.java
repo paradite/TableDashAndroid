@@ -142,13 +142,13 @@ public class BaseActivity extends Activity {
                 notification_time = Helper.parseDateFromString(notification_string);
                 current_table_ID = preferences.getString(TAG_TABLE_ID, null);
                 Log.e(TAG, "end: " + ending_time.getTime() + "noti: " + notification_time.getTime() + "eating? " + isEating());
-                Log.e(TAG, "now: " + Calendar.getInstance().getTime().getTime());
+                Log.e(TAG, "now: " + new Date().getTime());
 
             }
         }
         if(isEating()){
             //        Log out user after time passed in case the activity does not gets closed
-            final int delay = (int)(ending_time.getTime() - Calendar.getInstance().getTime().getTime());
+            final int delay = (int)(ending_time.getTime() - new Date().getTime());
             final int notification_delay = (int)(notification_time.getTime() - Calendar.getInstance().getTime().getTime());
             Log.e(TAG, "delay: " + delay + "noti delay: " + notification_delay);
             r = new Runnable() {
