@@ -74,7 +74,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#4E6E7F"
+            android:background="#3A66A2"
 
             android:id="@+id/btn_picker_check_status"
             android:layout_below="@+id/radioGroup_Location"
