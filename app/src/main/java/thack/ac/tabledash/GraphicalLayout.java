@@ -41,7 +41,7 @@ public class GraphicalLayout extends SurfaceView implements SurfaceHolder.Callba
                 canvas.drawText(table.getID(), (table.getRect().left + table.getRect().width() / 2 - paintBlack.measureText(table.getID()) / 2),
                         (table.getRect().top + table.getRect().height() / 2), paintBlack);
 
-                table.setDurationLeft(table.getDurationLeft() - 1);
+//                table.setDurationLeft(table.getDurationLeft() - 1);
             }
         }
 

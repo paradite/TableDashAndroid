@@ -41,6 +41,7 @@ import android.widget.Toast;
 
 import com.braintreepayments.api.Braintree;
 import com.braintreepayments.api.dropin.BraintreePaymentActivity;
+import com.braintreepayments.api.dropin.Customization;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -690,6 +691,12 @@ public class BaseActivity extends Activity {
     public void onBraintreeSubmit(Context context) {
         Intent intent = new Intent(context, BraintreePaymentActivity.class);
         intent.putExtra(BraintreePaymentActivity.EXTRA_CLIENT_TOKEN, clientToken2);
+        Customization customization = new Customization.CustomizationBuilder()
+                .primaryDescription("Donate")
+                .submitButtonText("Donate")
+                .build();
+        intent.putExtra(BraintreePaymentActivity.EXTRA_CUSTOMIZATION, customization);
+
         // REQUEST_CODE is arbitrary and is only used within this activity.
         startActivityForResult(intent, REQUEST_CODE);
     }

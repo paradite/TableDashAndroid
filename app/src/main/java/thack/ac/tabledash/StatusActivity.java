@@ -236,7 +236,10 @@ public class StatusActivity extends BaseActivity {
                             duration = Integer.parseInt(ending_time);
                         }else{
                             Date ending_date = Helper.parseDateFromString(ending_time);
-                            duration = (int) (ending_date.getTime() - Calendar.getInstance().getTime().getTime()) / 1000/1000/60;
+
+                            Log.e(TAG, "end: " + ending_date.getTime() + "\nnow: " + Calendar.getInstance().getTime().getTime());
+                            duration = (int) (ending_date.getTime() - Calendar.getInstance().getTime().getTime()) / 1000/60;
+                            Log.e(TAG, "duration: " + duration);
                             if(duration < 0 ){
                                 duration = 0;
                             }
@@ -330,7 +333,7 @@ public class StatusActivity extends BaseActivity {
                                 duration = Integer.parseInt(ending_time);
                             } else {
                                 Date ending_date = Helper.parseDateFromString(ending_time);
-                                duration = (int) (ending_date.getTime() - Calendar.getInstance().getTime().getTime()) / 1000/1000/60;
+                                duration = (int) (ending_date.getTime() - Calendar.getInstance().getTime().getTime()) / 1000/60;
                                 if (duration < 0) {
                                     duration = 0;
                                 }
